@@ -1,27 +1,31 @@
 #include "DayActions.hpp"
-using namespace std;
 
-virtual bool DayActions::upgradeFactors();
+///virtual bool DayActions::upgradeFactors();
 
 bool DayActions::sort()
     {
-    bool ans = true;
+    bool ans = true, flag = false;
     int i = 0, j = 0;
-    for(int j = 0; j < collection.size(); j++)
+    for(int j = collection.size()-1; j > 0; --j)
         {
-        //ustalanie j-otej pozycji
-        for(int i = j+1; i < collection.size(); i++) //i-te pozycje to od j-otej do konca
+        for(int i = 0; i < j; i++) //i-te pozycje to od 0 do j-otej 
             {
-            int z = collection[i]->isEqual(collection[j]);
-            if(z < 0)// jesli aktualna j-ota pozycja jest wieksza od i-tej
+            int z = collection[i]->isEqual(collection[i+1]);
+            
+            if(z > 0)// jesli aktualna i-ta pozycja jest wieksza od i+1-szej
                 {   //zamieniamy je
                 Action* temporary = collection[i];
-                collection[i] = collection[j];
-                collection[j] = temporary;
+                collection[i] = collection[i+1];
+                collection[i+1] = temporary;
+                flag = true;    //ustwienie flagi gdy nastąpi zmiana 
                 }
             else if(z == 0) //gdy pozycje sa rowne lub jedna zawiera sie w drugiej
                 ans = false;
             }
+        
+        if(!flag)   //gdy flaga nie ustawiona konczymy sortowanie
+            break;
+        flag = false;   //reset flagi, gdy jest ustawiona dla następnej pętli
         }
     return ans;
     }
