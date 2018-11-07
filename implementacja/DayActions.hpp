@@ -26,8 +26,14 @@ class DayActions : public Chromosome
         virtual bool upgradeFactors();
         void sort();
 
+    private:
+        std::vector<Action*>* getPart(TimeRange&);
+        bool setPart(std::vector<Action*>,Factors);
+
     public:
         DayActions(GoalFunction* goalFunction_, std::vector<Action*> cl_types);
+
+        Factors getStartFactors();
 
         virtual bool checkRestrictionsAndRetake();
         virtual bool randomDayActions();
