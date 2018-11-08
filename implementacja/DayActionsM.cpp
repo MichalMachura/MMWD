@@ -68,58 +68,117 @@ Chromosome* DayActions::mutation()
 std::vector<Action*>* DayActions::getPart(TimeRange& range)
     {
     if(range.begin == range.end)
-        return nullptr;
+        return new std::vector<Action*>;
 
     std::vector<Action*>* part = new std::vector<Action*>;
 
-    if(range.begin == start_ && range.end == end_)
+    for(Action* x : *collection)
         {
-        //copy all
-        }
-
-    int previous_start_time = 0;
-    int previous_end_time =0;
-
-    for(int i = 0; i< collection.size(); ++i)
-        {
-        Action* x = collection[i];
         if(x->getEnd() < range.begin)
             {
             continue;
             }
         else if(x->getBegin() >= range.begin && x->getEnd()< range.end)  //1
             {
-            //dodajemy  w pelni nalezy
+            part->push_back(x->clone());
             }
         else if(x->getBegin() < range.begin && x->getEnd()> range.begin)        //2
             {
-            //w czesci nalezy lewy brzeg
+            //in part it belongs to range -> left end
             if(range.end < x->getEnd())    //x contain whole range with range's ends
+                {
+                Action* aux = x->clone();
+                aux->setBegin(range.begin);
+                aux->setEnd(range.end);
+                part->push_back(aux);
+                break;
+                }
+            else    //x->getEnd()<= range.end   //range contain part with end of x and perhaps something more
+                {
+                Action* aux = x->clone();
+                aux->setBegin(range.begin);
+                part->push_back(aux);
+                }
+            }
+        else if(x->getBegin() < range.end && x->getEnd() >= range.end)        //30
+            {
+            //in part it belongs to range -> right end
+            if(x->getBegin() < range.begin )//x contain whole range with range's ends
+                {
+                Action* aux = x->clone();
+                aux->setBegin(range.begin);
+                aux->setEnd(range.end);
+                part->push_back(aux);
+                }
+            else    //range.begin <= x->getBegin()   //range contain part with begin of x and perhaps something more
+                {
+                Action* aux = x->clone()
+                aux->setEnd(range.end);
+                part->push_back(aux);
+                }
+            break;  //it's last possible action part
+            }
+        else if(range.end <= x->getBegin())
+            break;  //after last possible action
+        }
 
-            else    //range.end >= x->getEnd()   //range contain part with end of x and perhaps something more
+    return part;
+    }
+
+bool DayActions::setPart(std::vector<Action*>* part, Factors start_factors, TimeRange& range)
+    {
+    if(range.begin == range.end)
+        return false;
+
+    std::vector<int> indexes;
+
+    for(int i = 0; i < collection.size() ; ++i)
+        {
+        Action* x = *part[i];
+
+        if(x->getEnd() < range.begin)
+            {
+            continue;
+            }
+        else if(x->getBegin() >= range.begin && x->getEnd()< range.end)  //full x action is containing at range
+            {
+            indexes.push_back(i);
+            delete x;
+            }
+        else if(x->getBegin() < range.begin && x->getEnd()> range.begin)        //2
+            {
+            //in part it belongs to range -> left end
+            if(range.end < x->getEnd())    //x contain whole range with range's ends => dividing this action for 2 actions
+                {
+                Action* second = x->divideByRange(range);
+                if(second)
+                    collection.push_back(second);
+
+                break;
+                }
+            else    //x->getEnd()<= range.end   //range contain part with end of x and perhaps something more
                 {
 
                 }
             }
         else if(x->getBegin() < range.end && x->getEnd() >= range.end)        //30
             {
-            //w czesci nalezy prawy brzeg
+            //in part it belongs to range -> right end
             if(x->getBegin() < range.begin )//x contain whole range with range's ends
                 {
 
                 }
-            else    //range.begin <= x->getEnd()   //range contain part with begin of x and perhaps something more
+            else    //range.begin <= x->getBegin()   //range contain part with begin of x and perhaps something more
                 {
-
                 }
             break;  //it's last possible action part
             }
         else if(range.end <= x->getBegin())
             break;  //after last possible action
-
         }
+
+
+
     }
-
-
 
 
