@@ -62,7 +62,7 @@ Chromosome* DayActions::mutation()
 
 
 //.....................
-
+//to do
     }
 
 std::vector<Action*>* DayActions::getPart(TimeRange& range)
@@ -218,4 +218,3 @@ bool DayActions::setPart(std::vector<Action*>* part, Factors start_factors, Time
 
     return ans;
     }
-
