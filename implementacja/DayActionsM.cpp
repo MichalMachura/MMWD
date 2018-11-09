@@ -125,12 +125,10 @@ std::vector<Action*>* DayActions::getPart(TimeRange& range)
     return part;
     }
 
-bool DayActions::setPart(std::vector<Action*>* part, Factors start_factors, TimeRange& range)
+bool DayActions::deleteRange(TimeRange& range)
     {
-    if(range.begin == range.end)
-        return false;
-
-    std::vector<int> indexes;
+    bool ans = true;
+    int first = 0, num_to_erase = 0;
 
     for(int i = 0; i < collection.size() ; ++i)
         {
@@ -142,8 +140,12 @@ bool DayActions::setPart(std::vector<Action*>* part, Factors start_factors, Time
             }
         else if(x->getBegin() >= range.begin && x->getEnd()< range.end)  //full x action is containing at range
             {
-            indexes.push_back(i);
             delete x;
+
+            if(num_to_erase++ == 0)
+                {
+                first = i;    //adding index to later delete from collection a pointer value
+                }
             }
         else if(x->getBegin() < range.begin && x->getEnd()> range.begin)        //2
             {
@@ -151,25 +153,38 @@ bool DayActions::setPart(std::vector<Action*>* part, Factors start_factors, Time
             if(range.end < x->getEnd())    //x contain whole range with range's ends => dividing this action for 2 actions
                 {
                 Action* second = x->divideByRange(range);
-                if(second)
-                    collection.push_back(second);
 
-                break;
+                if(second != nullptr)
+                    collection.push_back(second);   //adding second part of x
+
+                break;  //end of range
                 }
             else    //x->getEnd()<= range.end   //range contain part with end of x and perhaps something more
                 {
+                Action* second = x->divideByRange(TimeRange({range.begin,x->getEnd()}));
 
+                if(second != nullptr)       //second should be nullptr, but if it's not
+                    ans = false;
                 }
             }
-        else if(x->getBegin() < range.end && x->getEnd() >= range.end)        //30
+        else if(x->getBegin() < range.end && x->getEnd() >= range.end)        //3
             {
             //in part it belongs to range -> right end
-            if(x->getBegin() < range.begin )//x contain whole range with range's ends
+            if(x->getBegin() < range.begin )//x contain whole range with range's ends => dividing this action for 2 actions
                 {
+                Action* second = x->divideByRange(range);
 
+                if(second != nullptr)
+                    collection.push_back(second);   //adding second part of x
+
+                break;  //end of range
                 }
             else    //range.begin <= x->getBegin()   //range contain part with begin of x and perhaps something more
                 {
+                Action* second = x->divideByRange(TimeRange({x->getBegin(),range.end}));
+
+                if(second != nullptr)       //second should be nullptr, but if it's not
+                    ans = false;
                 }
             break;  //it's last possible action part
             }
@@ -177,8 +192,30 @@ bool DayActions::setPart(std::vector<Action*>* part, Factors start_factors, Time
             break;  //after last possible action
         }
 
+    if(num_to_erase)    //is >0
+        {
+        collection.erase(collection.begin()+first, collection.begin()+first+num_to_erase);
+        }
 
-
+    return ans;
     }
 
+bool DayActions::setPart(std::vector<Action*>* part, Factors start_factors, TimeRange& range)   //it's delete the memory allocated for part
+    {
+    if(range.begin == range.end)
+        return false;
+
+    bool ans = deleteRange(range);
+
+    for(Action* x : *part)
+        {
+        collection.push_back(x);
+        }
+
+    part->clear();
+
+    delete part;
+
+    return ans;
+    }
 

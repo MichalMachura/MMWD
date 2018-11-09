@@ -7732,9 +7732,9 @@
 							"left": 80,
 							"top": 384,
 							"width": 265,
-							"height": 113,
+							"height": 142,
 							"autoResize": false,
-							"text": "jesli przedzial range jest przylegly do poczatku lub konca czyynosci -> nullptr;                  jesli range jest wewnatrz przedzialu czynnosci to tworzymy new (Coffee/Sleep)  -> wskaznik zwrocony przez new;              jesli czynnosc jest \"momentowa/chwilowa\"  -> nullptr   ",
+							"text": "jesli przedzial range jest przylegly do poczatku lub konca czyynosci -> nullptr; jesli range jest wewnatrz przedzialu czynnosci to tworzymy new (Coffee/Sleep)  -> wskaznik zwrocony przez new;              jesli czynnosc jest \"momentowa/chwilowa\"  -> nullptr                                                             range jest przedzialem ktory jest usuwany z tej czynnosci. this powinno być odpowiednio zmodyfikwane",
 							"wordWrap": true
 						}
 					]

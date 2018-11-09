@@ -30,6 +30,7 @@ class DayActions : public Chromosome
         std::vector<Action*>* getPart(TimeRange&);
         bool setPart(std::vector<Action*>*,Factors, TimeRange&);
         Factors getStartFactorsAt(int begin_);
+        bool deleteRange(TimeRange&);
 
     public:
         DayActions(GoalFunction* goalFunction_, std::vector<Action*> cl_types);
