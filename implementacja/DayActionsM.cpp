@@ -61,8 +61,35 @@ Chromosome* DayActions::mutation()
         t2 = TimeRange::randomTimeRange(start_, end_, length_to_mutation);
 
 
-//.....................
-//to do
+    Factors factors_1 = goal_function->getFactorsAt(t1.begin,start_factors,*collection);    // taking factors at point at time of begin range
+    Factors factors_2 = goal_function->getFactorsAt(t2.begin,start_factors,*collection);
+
+    std::vector<Action*>* help_vector1 = getPart(t1);   //taking part from range
+    std::vector<Action*>* help_vector2 = getPart(t2);
+
+    if(!ans->setPart(help_vector1,factors_1,t2)) // error with deleting
+        {
+        for(Action* x : *help_vector1)
+            delete x;
+        for(Action* x : *help_vector2)
+            delete x;
+
+        *ans = *this;
+        return ans;
+        }
+
+    if(!ans->setPart(help_vector2,factors_2,t1))    //error with deleting
+        {
+        for(Action* x : *help_vector1)
+            delete x;
+        for(Action* x : *help_vector2)
+            delete x;
+
+        *ans = *this;
+        return ans;
+        }
+
+    return ans;
     }
 
 std::vector<Action*>* DayActions::getPart(TimeRange& range)
@@ -200,12 +227,15 @@ bool DayActions::deleteRange(TimeRange& range)
     return ans;
     }
 
-bool DayActions::setPart(std::vector<Action*>* part, Factors start_factors, TimeRange& range)   //it's delete the memory allocated for part
+bool DayActions::setPart(std::vector<Action*>* part, Factors start_part_factors, TimeRange& range)   //it's delete the memory allocated for part
     {
     if(range.begin == range.end)
         return false;
 
     bool ans = deleteRange(range);
+
+    if(range.begin == 0)
+        start_factors = start_part_factors;
 
     for(Action* x : *part)
         {
