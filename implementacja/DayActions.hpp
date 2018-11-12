@@ -9,6 +9,7 @@
 #include<stdio.h>
 #include<vector>
 #include<string>
+#include "generateRandom.hpp"
 
 
 class DayActions : public Chromosome
@@ -33,8 +34,6 @@ class DayActions : public Chromosome
 
     public:
         DayActions(GoalFunction* goalFunction_, std::vector<Action*> cl_types);
-
-
 
         virtual bool checkRestrictionsAndRetake();
         virtual bool randomDayActions();

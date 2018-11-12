@@ -10,7 +10,6 @@
 #include<algorithm>
 #include<sstream>
 #include<iostream>
-
 //const unsigned int thread_number = 10;
 
 class GeneticAlgorithm
