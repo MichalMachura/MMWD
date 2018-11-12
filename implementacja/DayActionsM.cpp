@@ -3,9 +3,9 @@ using namespace std;
 
 virtual bool DayActions::upgradeFactors();
 
-bool DayActions::sort()
+void DayActions::sort() //setting and removing flags
     {
-    bool ans = true, flag = false;
+    bool flag = false;
     int i = 0, j = 0;
     for(int j = collection.size()-1; j > 0; --j)
         {
@@ -20,15 +20,16 @@ bool DayActions::sort()
                 collection[i+1] = temporary;
                 flag = true;    //ustwienie flagi gdy nast¹pi zmiana
                 }
-            else if(z == 0) //gdy pozycje sa rowne lub jedna zawiera sie w drugiej
-                ans = false;
             }
 
         if(!flag)   //gdy flaga nie ustawiona konczymy sortowanie
             break;
+
+        modified = true;        //setting and removing flags
+        updated_factors = false;
+
         flag = false;   //reset flagi, gdy jest ustawiona dla nastêpnej pêtli
         }
-    return ans;
     }
 
 Chromosome* DayActions::replacePart(DayActions* other, TimeRange range)
@@ -51,8 +52,19 @@ Chromosome* DayActions::replacePart(DayActions* other, TimeRange range)
     std::vector<Action*>* part = second->getPart(range);        //getting part from second
     Factors part_start_factors = second->goal_function->getFactorsAt(range.getBegin(),&(second->start_factors,second->collection)); //pasting it to first at the range
 
-    if(!ans->setPart(part, part_start_factors, range))
+    if(!ans->setPart(part, part_start_factors, range))      //problems with deleting
+        {
         *ans = *this;
+        return ans;
+        }
+
+    ans->sort();
+
+    if(!(ans->checkRestrictionsAndRetake()) || !(ans->upgradeFactors()))        //if is not correct or cannot be updated
+        {
+        *ans = *this;
+        return ans;
+        }
 
     return ans;
     }
@@ -70,7 +82,7 @@ Chromosome* DayActions::crossingOver(Chromosome* other)
 
     TimeRange range = TimeRange::randomTimeRange(start_,end_, length_to_cross);
 
-    return replacePart(second,range);
+    return replacePart(second,range);      //replace at the range
     }
 
 Chromosome* DayActions::mutation()
@@ -115,10 +127,11 @@ Chromosome* DayActions::mutation()
         return ans;
         }
 
-    sort();
+    ans->sort();
 
-    if(!checkRestrictionsAndRetake())   //if it cannot be corrected
+    if(!(ans->checkRestrictionsAndRetake()) || !(ans->upgradeFactors()))   //if it cannot be corrected or be updated
         *ans = *this;
+
 
     return ans;
     }
@@ -183,7 +196,7 @@ std::vector<Action*>* DayActions::getPart(TimeRange& range)
     return part;
     }
 
-bool DayActions::deleteRange(TimeRange& range)
+bool DayActions::deleteRange(TimeRange& range)  //setting flag modified and removing updated_factors
     {
     bool ans = true;
     int first = 0, num_to_erase = 0;
@@ -255,11 +268,13 @@ bool DayActions::deleteRange(TimeRange& range)
         collection.erase(collection.begin()+first, collection.begin()+first+num_to_erase);
         }
 
+    modified = true;        // setting and removing flags
+    updated_factors = false;
     return ans;
     }
 
 bool DayActions::setPart(std::vector<Action*>* part, Factors start_part_factors, TimeRange& range)   //it's delete the memory allocated for part - vector but not it's elements. they are copping to collection. collection is not sorted.
-    {
+    {   //setting flag modified and removing updated_factors
     if(range.begin == range.end)
         return false;
 
@@ -277,5 +292,81 @@ bool DayActions::setPart(std::vector<Action*>* part, Factors start_part_factors,
 
     delete part;
 
+    modified = true;        //setting and removing flags
+    updated_factors = false;
+
     return ans;
     }
+
+Chromosome* DayActions::randomChromosome()
+    {
+    return randomDayActions();
+    }
+
+bool DayActions::upgradeFactors()   //setting flag updated_factors
+    {
+    if(modified)        //if some modifications
+        checkRestrictionsAndRetake();
+
+    bool ans = true;        // answer of upgrading modifiers
+    Factors previous = start_factors;   //previous factors and time when they are located
+    int previous_time = start_;
+
+    for(Action* x : collection)
+        {
+        if(!(x->upgradeModifiers(&collection))) // if any returned false
+            ans = false;    // answer is false
+
+        previous = x->factorsAfter(previous,previous_time); //upgrading factors , setting previous factors
+        previous_time = x->getEnd();                                            // and they're time
+        }
+
+    updated_factors = true; //setting flag
+
+    return ans;
+    }
+
+
+bool DayActions::checkRestrictionsAndRetake()   //removing modified and updated_factors
+    {
+    bool ans = true;
+
+    sort();
+
+    for(unsigned int i = 0; i < collection.size()-1; ++i)   //checking the overlap of times
+        {
+        if(collection[i]->isEqual(*(collection[i+1]) == 0)      //overlapping
+            {
+            delete collection[i+1];
+            collection.erase(collection.begin()+i+1);   //deleting element
+            --i;    //decrement i to compare current element with element next to deleted
+
+            modified = true;        //setting and removing flags
+            updated_factors = false;
+            }
+        }
+
+    for(Action* x : class_types)
+        if(!(x->checkRestrictionsAndRetake(&collection)))
+            ans = false;
+
+    modified = false;   //setting flag
+    updated_factors = false;
+    return ans;
+    }
+
+bool DayActions::deleteAction(Action* action)   //setting flag modified and removing updated_factors
+    {
+    auto iterator_ = find(collection.begin(),collection.end(),action);
+
+    if(iterator_ != collection.end())
+        {
+        modified = true;    // setting flag
+        updated_factors = false;
+        collection.erase(iterator_);
+        return true;
+        }
+
+    return false;
+    }
+

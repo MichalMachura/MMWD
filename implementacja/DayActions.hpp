@@ -18,7 +18,7 @@ class DayActions : public Chromosome
         static const int start_ = 0;
         static const int end_ = 60*24;
         bool modified;
-        bool correct;
+        bool updated_factors;
         Factors start_factors;
         std::vector<Action*> collection;
         GoalFunction* goal_function;
@@ -26,6 +26,7 @@ class DayActions : public Chromosome
 
         virtual bool upgradeFactors();
         void sort();
+        virtual bool checkRestrictionsAndRetake();
 
     private:
         std::vector<Action*>* getPart(TimeRange&);
@@ -34,15 +35,18 @@ class DayActions : public Chromosome
 
     public:
         DayActions(GoalFunction* goalFunction_, std::vector<Action*> cl_types);
+        DayActions(DayActions& other);
 
-        virtual bool checkRestrictionsAndRetake();
-        virtual bool randomDayActions();
+        virtual DayActions* randomDayActions();
 
         bool addAction(Action*);
+        bool deleteAction(Action*);
         DayActions* replacePart(DayActions*, TimeRange);
         double countGoalFunction();
 
         virtual std::string toString();
+
+        virtual ~DayActions();
 };
 
 #endif
