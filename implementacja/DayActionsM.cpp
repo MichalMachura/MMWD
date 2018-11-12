@@ -303,7 +303,7 @@ Chromosome* DayActions::randomChromosome()
     return randomDayActions();
     }
 
-bool DayActions::upgradeFactors()   //setting flag updated_factors
+bool DayActions::updateFactors()   //setting flag updated_factors
     {
     if(modified)        //if some modifications
         checkRestrictionsAndRetake();
@@ -320,6 +320,8 @@ bool DayActions::upgradeFactors()   //setting flag updated_factors
         previous = x->factorsAfter(previous,previous_time); //upgrading factors , setting previous factors
         previous_time = x->getEnd();                                            // and they're time
         }
+
+    goal_function_value = countGoalFunction();
 
     updated_factors = true; //setting flag
 
@@ -355,7 +357,7 @@ bool DayActions::checkRestrictionsAndRetake()   //removing modified and updated_
     return ans;
     }
 
-bool DayActions::deleteAction(Action* action)   //setting flag modified and removing updated_factors
+bool DayActions::removeAction(Action* action)   //setting flag modified and removing updated_factors
     {
     auto iterator_ = find(collection.begin(),collection.end(),action);
 
@@ -370,3 +372,10 @@ bool DayActions::deleteAction(Action* action)   //setting flag modified and remo
     return false;
     }
 
+double DayActions::goalFunction()   //return value of goal function
+    {
+    if(modified)        //if was some modification
+        updateFactors();
+
+    return goal_function_value;
+    }

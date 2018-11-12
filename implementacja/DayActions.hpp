@@ -23,10 +23,12 @@ class DayActions : public Chromosome
         std::vector<Action*> collection;
         GoalFunction* goal_function;
         std::vector<Action*> class_types;
+        double goal_function_value;
 
-        virtual bool upgradeFactors();
+        virtual bool updateFactors();
         void sort();
         virtual bool checkRestrictionsAndRetake();
+        double countGoalFunction();
 
     private:
         std::vector<Action*>* getPart(TimeRange&);
@@ -40,9 +42,8 @@ class DayActions : public Chromosome
         virtual DayActions* randomDayActions();
 
         bool addAction(Action*);
-        bool deleteAction(Action*);
+        bool removeAction(Action*);
         DayActions* replacePart(DayActions*, TimeRange);
-        double countGoalFunction();
 
         virtual std::string toString();
 
