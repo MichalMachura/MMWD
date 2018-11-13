@@ -4,6 +4,7 @@
 #include<vector>
 #include<sstream>
 #include<stdio.h>
+#include <iostream>
 
 class Chromosome
     {
@@ -11,7 +12,7 @@ class Chromosome
         virtual Chromosome* crossingOver(Chromosome*) = 0;
         virtual Chromosome* mutation() = 0;
         virtual double goalFunction() = 0;
-        virtual Chromosome* randomChromosome() = 0;
+        virtual Chromosome* randomChromosome() const = 0;
         virtual std::string toString() = 0;
         virtual ~Chromosome(){;}
     };
@@ -23,11 +24,17 @@ class Ciag : public Chromosome
         static const int length = 10;
 
     public:
-        virtual Chromosome* crossingOver(Chromosome*) ;
-        virtual Chromosome* mutation();
-        virtual double goalFunction();
-        virtual Chromosome* randomChromosome();
-        virtual std::string toString();
+        Ciag(){;}
+        Ciag(Ciag&);
+
+        Ciag& operator=(Ciag& other);
+
+        Chromosome* crossingOver(Chromosome*);
+        Chromosome* mutation();
+        double goalFunction();
+        Chromosome* randomChromosome() const;
+        std::string toString();
+
         virtual ~Ciag(){;}
     };
 

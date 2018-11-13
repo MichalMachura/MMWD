@@ -1,6 +1,6 @@
 #include"Chromosome.hpp"
 
-Chromosome* Ciag::randomChromosome()
+Chromosome* Ciag::randomChromosome() const
     {
     Ciag* ciag = new Ciag();
     std::vector<int> vec({1,2,3,4,5,6,7,8,9,10});
@@ -15,6 +15,18 @@ Chromosome* Ciag::randomChromosome()
     return ciag;
     }
 
+Ciag::Ciag(Ciag& other)
+    {
+    *this = other;
+    }
+
+Ciag& Ciag::operator=(Ciag& other)
+    {
+    for(int i = 0; i< this->length; ++i)
+        this->tab[i] = other.tab[i];
+
+    return *this;
+    }
 double Ciag::goalFunction()
     {
     double ans =0.0;
@@ -26,7 +38,8 @@ double Ciag::goalFunction()
 
 Chromosome* Ciag::mutation()
     {
-    Ciag* ch = new Ciag(*this);
+    Ciag* ch = new Ciag();
+    *ch = *this;
 
     int r1 = rand()%length;
     int r2 = rand()%length;
@@ -42,17 +55,17 @@ Chromosome* Ciag::mutation()
 
 Chromosome* Ciag::crossingOver(Chromosome* other)
     {
-    if(!other)
-        return nullptr;
+    if(other == nullptr)
+        throw std::string("nullptr as a Chromosome* in crossingOver");
 
 
-    Ciag* other_ = (Ciag*)other;
-    Ciag* ch;
+    Ciag* other_ = dynamic_cast<Ciag*>(other);
+    Ciag* ch  =new Ciag();
 
     if(rand()%2)        //random choosing the parent who will give more DNA
-        ch = new Ciag(*this);
+        *ch =*this;
     else
-        ch = new Ciag(*other_);
+        *ch = *other_;
 
 
     int r[3];               //searching for 3 vary random position in tab
@@ -70,16 +83,15 @@ Chromosome* Ciag::crossingOver(Chromosome* other)
             if(ch->tab[r[i]] == other_->tab[j])
                 {
                 posOther_[i] = j;
-                continue;
+                break;
                 }
 
     //replace the value
-    for(int i =0; i < 3; ++i)
+    for(int i = 0; i < 3; ++i)
         {
-        int aux = ch->tab[r[2-i]];
         ch->tab[r[2-i]] = other_->tab[posOther_[i]];
-        other_->tab[posOther_[i]] = aux;
         }
+
 
     return ch;
     }

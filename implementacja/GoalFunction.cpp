@@ -1,6 +1,5 @@
 #include "CoffeeAndSleepGoalFunction.hpp"
 
-
 Factors CoffeeAndSleepGoalFunction::getFactorsAt(int time, Factors start_factors, std::vector<Action*>* collection_)
     {
     if(time == 0)

@@ -1,39 +1,9 @@
 #include "GeneticAlgorithm.hpp"
 
-GeneticAlgorithm::GeneticAlgorithm(Chromosome* start_object ,double min_diffrence_between_generations_best_, unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_, unsigned int max_of_iteration_ ,unsigned int max_population_size_,unsigned int max_best_, std::vector<Chromosome*> population_) :NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION(NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_), population(population_)
+GeneticAlgorithm::GeneticAlgorithm(std::ostream& output_, Chromosome* start_object ,double min_diffrence_between_generations_best_, unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_, unsigned int max_of_iteration_ ,unsigned int max_population_size_,unsigned int max_best_, std::vector<Chromosome*> population_) : output(output_)
     {
-    if(!start_object)
-        throw "Previous_best is nullptr. Can not create population without any representative of class which implements Chromosome interface";
+    setMaxValuesOfParameters(start_object,min_diffrence_between_generations_best_, NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_,max_of_iteration_, max_population_size_,max_best_, population_);
 
-    previous_best = start_object->randomChromosome();
-    population.push_back(previous_best);
-
-    //minimum difference between previous and current best
-    if(min_diffrence_between_generations_best_ < 0.0)
-        min_diffrence_between_generations_best = 0.0;
-    else
-        min_diffrence_between_generations_best = min_diffrence_between_generations_best_;
-
-    //iteration number
-    if(max_of_iteration_ < MIN_ITERATION)   //if is less than minimum
-        max_of_iteration = MIN_ITERATION;
-    else
-        max_of_iteration = max_of_iteration_;
-
-    // population size
-    if(max_population_size_ <= MIN_POPULATION_SIZE) //if set max is less than constant min
-        max_population_size = MIN_POPULATION_SIZE + 1;
-    else
-        max_population_size = max_population_size_;
-
-    //maximum of selected best
-    if(max_best_ <= MIN_BEST)   //if max is less than min
-        max_best = MIN_BEST + 1;
-
-    if(max_best_ >= MIN_POPULATION_SIZE)    //if set max of best is more than min of population, but should be that: min_best<max_best<min_population<max_population
-        max_best = MIN_POPULATION_SIZE-1;
-    else
-        max_best = max_best_;
 
     /*******************************************************/
     srand(time(NULL)); // rand initialization
@@ -56,10 +26,10 @@ void GeneticAlgorithm::startRandomPopulation()
             population.push_back(previous_best->randomChromosome());
             }
         }
-    catch(char* s)
+    catch(...)
         {
-        std::cout<<"/nRandom Population\n"<<current_iteration<<"\n"<<s<<std::endl;
-        throw s;
+        std::cout<<"/nRandom Population\n"<<current_iteration<<"\n"<<std::endl;
+        throw std::string("startRandomPopulation");
         }
 
 //    vector<std::thread> th(current_population_size - population.size();)    //threads vector
@@ -112,6 +82,66 @@ void GeneticAlgorithm::findBest()
         }
     }
 
+void GeneticAlgorithm::removeWeak()
+    {
+    /*for(unsigned int i = population.size()-1; i+1> current_best_size; --i)
+        {
+        bool is = 0;
+        for(Chromosome* x : current_best)
+            if(population[i] == x)  //if elem. belongs to the bests
+                {
+                is = true;
+                break;
+                }
+        if(!is) //if elem. does not belong to the bests
+            {
+            delete population[i];
+            population.erase(population.begin()+i);
+            }
+        }*/
+
+    for(Chromosome* x : current_best)
+        {
+        auto a = find(population.begin(),population.end(),x);
+
+        if( a != population.end() )
+            population.erase(a);
+        }
+
+    for(Chromosome* x : population)
+        delete x;
+
+    population.clear();
+
+    for(Chromosome* x : current_best)
+        population.push_back(x);
+
+    }
+
+void GeneticAlgorithm::crossing(int places_for_crossing)
+    {
+    for(int i = 0; i < places_for_crossing; ++i)
+        {
+        unsigned int r1 = rand()%current_best_size;
+        unsigned int r2 = rand()%current_best_size;
+
+        while(r2 == r1) // for the choosing the other chromosomes
+            r2 = rand()%current_best_size;
+
+        population.push_back(current_best[r1]->crossingOver(current_best[r2]));
+        }
+    }
+
+void GeneticAlgorithm::mutation(int places_for_mutation)
+    {
+    for(int i = 0; i < places_for_mutation; ++i)
+        {
+        unsigned int r1 = rand()%current_best_size;
+
+        population.push_back(current_best[r1]->mutation());
+        }
+    }
+
 Chromosome* GeneticAlgorithm::startAlgorithm(bool display)
     {
     if(!previous_best)
@@ -122,74 +152,26 @@ Chromosome* GeneticAlgorithm::startAlgorithm(bool display)
 
     while(current_iteration < max_of_iteration)
         {
-        previous_best = current_best[0]; //previous best
-
         try
-            {
-            //removing weak elements from population without strong elements
-            for(unsigned int i = population.size()-1; i+1> current_best_size; --i)
-                {
-                bool is = 0;
-                for(Chromosome* x : current_best)
-                    if(population[i] == x)  //if elem. belongs to the bests
-                        {
-                        is = true;
-                        break;
-                        }
-                if(!is) //if elem. does not belong to the bests
-                    {
-                    delete population[i];
-                    population.erase(population.begin()+i);
-                    }
-                }
-            }
-        catch(char* s)
-            {
-            std::cout<<"Removing weak elem.\n"<<current_iteration<<"\n"<<s<<std::endl;
-            throw s;
-            }
+        {
+        //previous best
+        previous_best = current_best[0];
+        //removing weak elements from population without strong elements
+        removeWeak();
+
         //new population size
         current_population_size = MIN_POPULATION_SIZE + rand()%(max_population_size-MIN_POPULATION_SIZE);
-        unsigned int free_places = current_population_size - population.size();
+        int free_places = current_population_size - population.size();
 
         //numbers of new cross-created chromosomes and for mutate-created. All is rand, but from the constant % range
-        unsigned int places_for_crossing = (MIN_FOR_CROSSING + rand()%(MAX_FOR_CROSSING-MIN_FOR_CROSSING))/100.0*free_places;
-        unsigned int places_for_mutation = free_places - places_for_crossing;
+        int places_for_crossing = (MIN_FOR_CROSSING + rand()%(MAX_FOR_CROSSING-MIN_FOR_CROSSING))/100.0*free_places;
+        int places_for_mutation = free_places - places_for_crossing;
 
-        try
-            {
-            //crossing
-            for(unsigned int i = 0; i < places_for_crossing; ++i)
-                {
-                unsigned int r1 = rand()%current_best_size;
-                unsigned int r2 = rand()%current_best_size;
+        //crossing
+        crossing(places_for_crossing);
 
-                while(r2 == r1) // for the choosing the other chromosomes
-                    r2 = rand()%current_best_size;
-
-                population.push_back(current_best[r1]->crossingOver(current_best[r2]));
-                }
-            }
-        catch(char* s)
-            {
-            std::cout<<"Crossing\n"<<current_iteration<<"\n"<<s<<std::endl;
-            throw s;
-            }
-        try
-            {
-            //mutation
-            for(unsigned int i = 0; i < places_for_mutation; ++i)
-                {
-                unsigned int r1 = rand()%current_best_size;
-
-                population.push_back(current_best[r1]->mutation());
-                }
-            }
-        catch(char* s)
-            {
-            std::cout<<"Mutation.\n"<<current_iteration<<"\n"<<s<<std::endl;
-            throw s;
-            }
+        //mutation
+        mutation(places_for_mutation);
 
         //changing size of choosing the best from population
         current_best_size = MIN_BEST + rand()%(max_best-MIN_BEST);
@@ -209,20 +191,40 @@ Chromosome* GeneticAlgorithm::startAlgorithm(bool display)
             current_number_of_repeted_suboptimal_solution = 0;
 
         if(display) //if it should be displayed every iteration
-            status(std::cout);
+            //output<<*this;
+            status(output);
 
         ++current_iteration;
         }
+        catch(...)
+            {
+            throw std::string("\nMemory error\n");
+            }
+        }
 
     reason_of_break = "Maximum iteration has been reached.";
+
     return current_best[0];
     }
 
 Chromosome* GeneticAlgorithm::restart(Chromosome* start_object ,double min_diffrence_between_generations_best_,unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_, unsigned int max_of_iteration_, unsigned int max_population_size_, unsigned int max_best_, std::vector<Chromosome*> population_)
     {
-    if(!start_object)
-        throw "Previous_best is nullptr. Can not create population without any representative of class which implements Chromosome interface";
+    setMaxValuesOfParameters(start_object,min_diffrence_between_generations_best_, NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_,max_of_iteration_, max_population_size_,max_best_, population_);
 
+    //srand(time(NULL)); // rand initialization
+
+    current_best_size = rand()%(max_best-MIN_BEST) + MIN_BEST;
+
+    current_population_size = MIN_POPULATION_SIZE + rand()%(max_population_size-MIN_POPULATION_SIZE);
+
+    if(population_.size() > current_population_size)
+        current_population_size = population_.size();
+
+    return startAlgorithm();
+    }
+
+void GeneticAlgorithm::deleteAllChromosomes()
+    {
     for(Chromosome* x : population)
         {
         delete x;
@@ -231,33 +233,58 @@ Chromosome* GeneticAlgorithm::restart(Chromosome* start_object ,double min_diffr
 
     previous_best = nullptr;
     current_best.clear();
+    }
 
+void GeneticAlgorithm::setMaxValuesOfParameters(Chromosome* start_object ,double min_diffrence_between_generations_best_,unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_, unsigned int max_of_iteration_, unsigned int max_population_size_, unsigned int max_best_, std::vector<Chromosome*> population_)
+    {
+    if(!start_object)
+        throw "Previous_best is nullptr. Can not create population without any representative of class which implements Chromosome interface";
 
-    population = population_;
-    NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION = NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_;
+    deleteAllChromosomes(); //clearing after previous
 
+    population = population_;   //population vector
+    NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION = NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_;     //setting of repeating the solution similar or the same as the answer or next / previous solution
+
+    //create new random chromosome from start object
     previous_best = start_object->randomChromosome();
     population.push_back(previous_best);
 
     //minimum difference between previous and current best
+    setMinDifferenceBetweenGenarationsBest(min_diffrence_between_generations_best_);
+    //iteration number
+    setMaxOfIteration(max_of_iteration_);
+    // population size
+    setMaxPopulationSize(max_population_size_);
+    //maximum of selected best
+    setMaxBest(max_best_);
+    }
+
+void GeneticAlgorithm::setMinDifferenceBetweenGenarationsBest(int min_diffrence_between_generations_best_)
+    {
     if(min_diffrence_between_generations_best_ < 0.0)
         min_diffrence_between_generations_best = 0.0;
     else
         min_diffrence_between_generations_best = min_diffrence_between_generations_best_;
+    }
 
-    //iteration number
+void GeneticAlgorithm::setMaxOfIteration(int max_of_iteration_)
+    {
     if(max_of_iteration_ < MIN_ITERATION)   //if is less than minimum
         max_of_iteration = MIN_ITERATION;
     else
         max_of_iteration = max_of_iteration_;
+    }
 
-    // population size
+void GeneticAlgorithm::setMaxPopulationSize(int max_population_size_)
+    {
     if(max_population_size_ <= MIN_POPULATION_SIZE) //if set max is less than constant min
         max_population_size = MIN_POPULATION_SIZE + 1;
     else
         max_population_size = max_population_size_;
+    }
 
-    //maximum of selected best
+void GeneticAlgorithm::setMaxBest(int max_best_)
+    {
     if(max_best_ <= MIN_BEST)   //if max is less than min
         max_best = MIN_BEST + 1;
 
@@ -265,18 +292,6 @@ Chromosome* GeneticAlgorithm::restart(Chromosome* start_object ,double min_diffr
         max_best = MIN_POPULATION_SIZE-1;
     else
         max_best = max_best_;
-
-    srand(time(NULL)); // rand initialization
-
-    current_best_size = rand()%(max_best-MIN_BEST) + MIN_BEST;
-
-
-    current_population_size = MIN_POPULATION_SIZE + rand()%(max_population_size-MIN_POPULATION_SIZE);
-
-    if(population_.size() > current_population_size)
-        current_population_size = population_.size();
-
-    return startAlgorithm();
     }
 
 std::ostream& GeneticAlgorithm::status(std::ostream& out)

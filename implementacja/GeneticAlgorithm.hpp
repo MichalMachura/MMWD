@@ -10,6 +10,7 @@
 #include<algorithm>
 #include<sstream>
 #include<iostream>
+#include "generateRandom.hpp"
 //const unsigned int thread_number = 10;
 
 class GeneticAlgorithm
@@ -18,6 +19,7 @@ class GeneticAlgorithm
         std::vector<Chromosome*> population;
         Chromosome* previous_best;
         std::vector<Chromosome*> current_best;
+        std::ostream& output;
 
         unsigned int current_best_size;
         unsigned int current_population_size;
@@ -42,13 +44,25 @@ class GeneticAlgorithm
 
         void startRandomPopulation();
         void findBest();
+        void setMaxValuesOfParameters(Chromosome* start_object ,double min_diffrence_between_generations_best_,unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_, unsigned int max_of_iteration_, unsigned int max_population_size_, unsigned int max_best_, std::vector<Chromosome*> population_);
+        void removeWeak();
+        void crossing(int places_for_crossing);
+        void mutation(int places_for_mutation);
+        void deleteAllChromosomes();
 
     public:
-        GeneticAlgorithm(Chromosome* start_object ,double min_diffrence_between_generations_best_,unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_ = 1, unsigned int max_of_iteration_ = 20,unsigned int population_size_ = 20,unsigned int max_best_ = 3, std::vector<Chromosome*> population_ = std::vector<Chromosome*>());
+        GeneticAlgorithm(std::ostream& output_, Chromosome* start_object ,double min_diffrence_between_generations_best_,unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_ = 1, unsigned int max_of_iteration_ = 20,unsigned int population_size_ = 20,unsigned int max_best_ = 3, std::vector<Chromosome*> population_ = std::vector<Chromosome*>());
 
         Chromosome* startAlgorithm(bool display = false);//true displaying every iteration
         Chromosome* restart(Chromosome* start_object ,double min_diffrence_between_generations_best_,unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_ = 1, unsigned int max_of_iteration_ = 20,unsigned int population_size_ = 20,unsigned int max_best_ = 3, std::vector<Chromosome*> population_ = std::vector<Chromosome*>());
 
+        //setters
+        void setMaxOfIteration(int max_of_iteration_);
+        void setMinDifferenceBetweenGenarationsBest(int min_diffrence_between_generations_best_);
+        void setMaxPopulationSize(int max_population_size_);
+        void setMaxBest(int max_best_);
+
+        //out
         friend std::ostream& operator<<(std::ostream& out, GeneticAlgorithm& obj);
         std::ostream& status(std::ostream&);
 

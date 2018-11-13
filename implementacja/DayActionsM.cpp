@@ -1,7 +1,4 @@
 #include "DayActions.hpp"
-using namespace std;
-
-virtual bool DayActions::upgradeFactors();
 
 void DayActions::sort() //setting and removing flags
     {
@@ -32,7 +29,7 @@ void DayActions::sort() //setting and removing flags
         }
     }
 
-Chromosome* DayActions::replacePart(DayActions* other, TimeRange range)
+DayActions* DayActions::replacePart(DayActions* other, TimeRange range)
     {
     bool with_one = rand()%2;
     DayActions* ans;
@@ -379,3 +376,5 @@ double DayActions::goalFunction()   //return value of goal function
 
     return goal_function_value;
     }
+
+

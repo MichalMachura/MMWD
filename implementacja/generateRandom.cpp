@@ -10,7 +10,7 @@
 
 int generateRandom(int low, int high){
 
-	srand(time(0));
+	//srand(time(0));
 	int rndInt;
 	if (low>=0 && high>=low)
 		rndInt = rand() % (high-low+1) + low;
