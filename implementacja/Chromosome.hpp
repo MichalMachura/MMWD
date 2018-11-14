@@ -9,11 +9,11 @@
 class Chromosome
     {
     public:
-        virtual Chromosome* crossingOver(Chromosome*) = 0;
-        virtual Chromosome* mutation() = 0;
-        virtual double goalFunction() = 0;
+        virtual Chromosome* crossingOver(const Chromosome*) const = 0;
+        virtual Chromosome* mutation() const = 0;
+        virtual double goalFunction()const = 0;
         virtual Chromosome* randomChromosome() const = 0;
-        virtual std::string toString() = 0;
+        virtual std::string toString() const = 0;
         virtual ~Chromosome(){;}
     };
 
@@ -25,15 +25,15 @@ class Ciag : public Chromosome
 
     public:
         Ciag(){;}
-        Ciag(Ciag&);
+        Ciag(const Ciag&);
 
-        Ciag& operator=(Ciag& other);
+        Ciag& operator=(const Ciag& other);
 
-        Chromosome* crossingOver(Chromosome*);
-        Chromosome* mutation();
-        double goalFunction();
+        Chromosome* crossingOver(const Chromosome*) const;
+        Chromosome* mutation() const;
+        double goalFunction() const;
         Chromosome* randomChromosome() const;
-        std::string toString();
+        std::string toString() const;
 
         virtual ~Ciag(){;}
     };

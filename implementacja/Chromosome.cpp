@@ -15,19 +15,19 @@ Chromosome* Ciag::randomChromosome() const
     return ciag;
     }
 
-Ciag::Ciag(Ciag& other)
+Ciag::Ciag(const Ciag& other)
     {
     *this = other;
     }
 
-Ciag& Ciag::operator=(Ciag& other)
+Ciag& Ciag::operator=(const Ciag& other)
     {
     for(int i = 0; i< this->length; ++i)
         this->tab[i] = other.tab[i];
 
     return *this;
     }
-double Ciag::goalFunction()
+double Ciag::goalFunction() const
     {
     double ans =0.0;
     for(int i = 0; i < length; ++i)
@@ -36,7 +36,7 @@ double Ciag::goalFunction()
     return ans;
     }
 
-Chromosome* Ciag::mutation()
+Chromosome* Ciag::mutation() const
     {
     Ciag* ch = new Ciag();
     *ch = *this;
@@ -53,13 +53,13 @@ Chromosome* Ciag::mutation()
     return ch;
     }
 
-Chromosome* Ciag::crossingOver(Chromosome* other)
+Chromosome* Ciag::crossingOver(const Chromosome* other) const
     {
     if(other == nullptr)
         throw std::string("nullptr as a Chromosome* in crossingOver");
 
 
-    Ciag* other_ = dynamic_cast<Ciag*>(other);
+    const Ciag* other_ = dynamic_cast<const Ciag*>(other);
     Ciag* ch  =new Ciag();
 
     if(rand()%2)        //random choosing the parent who will give more DNA
@@ -96,7 +96,7 @@ Chromosome* Ciag::crossingOver(Chromosome* other)
     return ch;
     }
 
-std::string Ciag::toString()
+std::string Ciag::toString() const
     {
     std::stringstream str;
 

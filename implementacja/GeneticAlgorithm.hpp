@@ -49,6 +49,10 @@ class GeneticAlgorithm
         void crossing(int places_for_crossing);
         void mutation(int places_for_mutation);
         void deleteAllChromosomes();
+        void generateCurrentValuesOfState();
+        void countPlacesForCrossingAndMutation(int& places_for_crossing, int& places_for_mutation);
+        bool bestIsReached();
+
 
     public:
         GeneticAlgorithm(std::ostream& output_, Chromosome* start_object ,double min_diffrence_between_generations_best_,unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_ = 1, unsigned int max_of_iteration_ = 20,unsigned int population_size_ = 20,unsigned int max_best_ = 3, std::vector<Chromosome*> population_ = std::vector<Chromosome*>());

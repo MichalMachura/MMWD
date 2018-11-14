@@ -14,7 +14,7 @@ int main()
         Ciag ch;
 
         //(wyswietlanie ,chrom. , roznica, liczba powtorzen wyniku, max iter.,max. populacja, max liczba wybieranych najlepszych)
-        GeneticAlgorithm genAlg = GeneticAlgorithm(cout,&ch,0,5,20,15,6);
+        GeneticAlgorithm genAlg = GeneticAlgorithm(cout,&ch,0,5,400,400,7);
 
         start_time = clock();
         Ciag* ans = (Ciag*) genAlg.startAlgorithm(true);

@@ -2,15 +2,13 @@
 
 GeneticAlgorithm::GeneticAlgorithm(std::ostream& output_, Chromosome* start_object ,double min_diffrence_between_generations_best_, unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_, unsigned int max_of_iteration_ ,unsigned int max_population_size_,unsigned int max_best_, std::vector<Chromosome*> population_) : output(output_)
     {
+    //setting parameters of max VALUES variables of state
     setMaxValuesOfParameters(start_object,min_diffrence_between_generations_best_, NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_,max_of_iteration_, max_population_size_,max_best_, population_);
-
 
     /*******************************************************/
     srand(time(NULL)); // rand initialization
 
-    current_best_size = rand()%(max_best-MIN_BEST) + MIN_BEST;
-
-
+    current_best_size = rand()%(max_best-MIN_BEST) + MIN_BEST;  //current sizes
     current_population_size = MIN_POPULATION_SIZE + rand()%(max_population_size-MIN_POPULATION_SIZE);
 
     if(population_.size() > current_population_size)
@@ -19,18 +17,23 @@ GeneticAlgorithm::GeneticAlgorithm(std::ostream& output_, Chromosome* start_obje
 
 void GeneticAlgorithm::startRandomPopulation()
     {
-    try
+
+    while(population.size()<current_population_size)
         {
-        while(population.size()<current_population_size)
+        Chromosome* ch;
+        try
             {
-            population.push_back(previous_best->randomChromosome());
+            ch = previous_best->randomChromosome();  //random chromosome
             }
+        catch(...)
+            {
+            throw std::string("/nError in method:\n Chromosome* randomChromosome()\n"); //if are some problems
+            }
+
+        population.push_back(ch);
         }
-    catch(...)
-        {
-        std::cout<<"/nRandom Population\n"<<current_iteration<<"\n"<<std::endl;
-        throw std::string("startRandomPopulation");
-        }
+
+
 
 //    vector<std::thread> th(current_population_size - population.size();)    //threads vector
 //
@@ -84,22 +87,6 @@ void GeneticAlgorithm::findBest()
 
 void GeneticAlgorithm::removeWeak()
     {
-    /*for(unsigned int i = population.size()-1; i+1> current_best_size; --i)
-        {
-        bool is = 0;
-        for(Chromosome* x : current_best)
-            if(population[i] == x)  //if elem. belongs to the bests
-                {
-                is = true;
-                break;
-                }
-        if(!is) //if elem. does not belong to the bests
-            {
-            delete population[i];
-            population.erase(population.begin()+i);
-            }
-        }*/
-
     for(Chromosome* x : current_best)
         {
         auto a = find(population.begin(),population.end(),x);
@@ -122,103 +109,141 @@ void GeneticAlgorithm::crossing(int places_for_crossing)
     {
     for(int i = 0; i < places_for_crossing; ++i)
         {
-        unsigned int r1 = rand()%current_best_size;
-        unsigned int r2 = rand()%current_best_size;
+        unsigned int r1 = rand()%current_best.size();
+        unsigned int r2 = rand()%current_best.size();
 
         while(r2 == r1) // for the choosing the other chromosomes
-            r2 = rand()%current_best_size;
+            r2 = rand()%current_best.size();
 
-        population.push_back(current_best[r1]->crossingOver(current_best[r2]));
+        Chromosome* ch;
+        try
+            {
+            ch = current_best[r1]->crossingOver(current_best[r2]);  //crossing
+            }
+        catch(...)
+            {
+            throw std::string("/nError in method:\nChromosome* crossingOver(Chromosome* )\n"); //if are some problems
+            }
+
+        population.push_back(ch);
         }
     }
 
 void GeneticAlgorithm::mutation(int places_for_mutation)
     {
+
     for(int i = 0; i < places_for_mutation; ++i)
         {
-        unsigned int r1 = rand()%current_best_size;
+        unsigned int r1 = rand()%current_best.size();
+        Chromosome* ch;
+        try
+            {
+            ch = current_best[r1]->mutation();  //mutation
+            }
+        catch(...)
+            {
+            throw std::string("/nError in method:\nChromosome* mutation()\n"); //if are some problems
+            }
 
-        population.push_back(current_best[r1]->mutation());
+        population.push_back(ch);
         }
+    }
+
+void GeneticAlgorithm::generateCurrentValuesOfState()
+    {   //current mean in future generation
+    current_best_size = rand()%(max_best-MIN_BEST) + MIN_BEST;  //current best sizes
+    current_population_size = MIN_POPULATION_SIZE + rand()%(max_population_size-MIN_POPULATION_SIZE);   //current population size
+    }
+
+void GeneticAlgorithm::countPlacesForCrossingAndMutation(int& places_for_crossing, int& places_for_mutation)
+    {
+    int free_places = current_population_size - population.size();
+    //numbers of new cross-created chromosomes and for mutate-created. All is rand, but from the constant % range
+    places_for_crossing = (MIN_FOR_CROSSING + rand()%(MAX_FOR_CROSSING-MIN_FOR_CROSSING))/100.0*free_places;
+    places_for_mutation = free_places - places_for_crossing;
+    }
+
+bool GeneticAlgorithm::bestIsReached()
+    {
+    if(current_best[0]->goalFunction()-previous_best->goalFunction() <= min_diffrence_between_generations_best)
+        {
+        if(++current_number_of_repeted_suboptimal_solution >= NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION-1)
+            {
+            reason_of_break = "Minimum difference between populations has been reached.";
+
+            return true;
+            }
+        }
+    else
+        current_number_of_repeted_suboptimal_solution = 0;
+
+    return false;
     }
 
 Chromosome* GeneticAlgorithm::startAlgorithm(bool display)
     {
     if(!previous_best)
         throw "Previous_best is nullptr. Can not create population without any representative of class which implements Chromosome interface";
-
-    startRandomPopulation();
-    findBest();
-
-    while(current_iteration < max_of_iteration)
+    try
         {
-        try
-        {
-        //previous best
-        previous_best = current_best[0];
-        //removing weak elements from population without strong elements
-        removeWeak();
+        generateCurrentValuesOfState(); //generation random values of best and population number
 
-        //new population size
-        current_population_size = MIN_POPULATION_SIZE + rand()%(max_population_size-MIN_POPULATION_SIZE);
-        int free_places = current_population_size - population.size();
+        if(population.size() > current_population_size)    //checking with started population
+            current_population_size = population.size();
 
-        //numbers of new cross-created chromosomes and for mutate-created. All is rand, but from the constant % range
-        int places_for_crossing = (MIN_FOR_CROSSING + rand()%(MAX_FOR_CROSSING-MIN_FOR_CROSSING))/100.0*free_places;
-        int places_for_mutation = free_places - places_for_crossing;
-
-        //crossing
-        crossing(places_for_crossing);
-
-        //mutation
-        mutation(places_for_mutation);
-
-        //changing size of choosing the best from population
-        current_best_size = MIN_BEST + rand()%(max_best-MIN_BEST);
-        //finding the best in population
+        startRandomPopulation();
         findBest();
 
-        if(current_best[0]->goalFunction()-previous_best->goalFunction() <= min_diffrence_between_generations_best)
+        while(current_iteration < max_of_iteration) //iteration condition
             {
-            if(++current_number_of_repeted_suboptimal_solution >= NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION-1)
-                {
-                reason_of_break = "Minimum difference between populations has been reached.";
-                ++current_iteration;
-                return current_best[0];
-                }
+            //previous best
+            previous_best = current_best[0];
+            //removing weak elements from population without strong elements
+            removeWeak();
+            //new population and next best size
+            generateCurrentValuesOfState();
+            //variables for result of counting places for crossing and mutation
+            int places_for_mutation, places_for_crossing;
+            //counting and generating number of crossing and mutation chromosomes which should be created
+            countPlacesForCrossingAndMutation(places_for_crossing,places_for_mutation);     //variables are forwarding by reference
+            //crossing
+            crossing(places_for_crossing);
+            //mutation
+            mutation(places_for_mutation);
+            //finding the best in population
+            findBest();
+
+            ++current_iteration;
+
+            if(bestIsReached())
+                break;
+
+            if(display) //if it should be displayed every iteration
+                //output<<*this;
+                status(output);
             }
-        else
-            current_number_of_repeted_suboptimal_solution = 0;
 
-        if(display) //if it should be displayed every iteration
-            //output<<*this;
-            status(output);
+        if(current_iteration >= max_of_iteration)   //if max iteration has been reached
+            reason_of_break = "Maximum iteration has been reached.";
 
-        ++current_iteration;
+        return current_best[0];
         }
-        catch(...)
-            {
-            throw std::string("\nMemory error\n");
-            }
+    catch(std::string s)
+        {
+        throw s;
         }
-
-    reason_of_break = "Maximum iteration has been reached.";
-
-    return current_best[0];
+    catch(...)
+        {
+        deleteAllChromosomes();
+        throw std::string("\nMemory errors\n");
+        }
     }
 
 Chromosome* GeneticAlgorithm::restart(Chromosome* start_object ,double min_diffrence_between_generations_best_,unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_, unsigned int max_of_iteration_, unsigned int max_population_size_, unsigned int max_best_, std::vector<Chromosome*> population_)
     {
+    deleteAllChromosomes();
+
     setMaxValuesOfParameters(start_object,min_diffrence_between_generations_best_, NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_,max_of_iteration_, max_population_size_,max_best_, population_);
-
-    //srand(time(NULL)); // rand initialization
-
-    current_best_size = rand()%(max_best-MIN_BEST) + MIN_BEST;
-
-    current_population_size = MIN_POPULATION_SIZE + rand()%(max_population_size-MIN_POPULATION_SIZE);
-
-    if(population_.size() > current_population_size)
-        current_population_size = population_.size();
 
     return startAlgorithm();
     }
@@ -390,9 +415,5 @@ std::ostream& operator<<(std::ostream& out, GeneticAlgorithm& obj)
 
 GeneticAlgorithm::~GeneticAlgorithm()
     {
-    for(Chromosome* x : population)
-        {
-        delete x;
-        }
-    population.clear();
+    deleteAllChromosomes();
     }
