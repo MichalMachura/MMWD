@@ -22,7 +22,7 @@ class DayActions : public Chromosome
         Factors start_factors;
         std::vector<Action*> collection;
         GoalFunction* goal_function;
-        std::vector<Action*> class_types;
+        std::vector<const Action const*> class_types;
         double goal_function_value;
 
         virtual bool updateFactors();
@@ -31,21 +31,24 @@ class DayActions : public Chromosome
         double countGoalFunction();
 
     private:
-        std::vector<Action*>* getPart(TimeRange&);
-        bool setPart(std::vector<Action*>*,Factors, TimeRange&);
+        std::vector<Action*>* getPart(TimeRange&) const;
+        bool setPart(std::vector<Action*>*,Factors&, TimeRange&);
         bool deleteRange(TimeRange&);
+        void deleteAllActions();
 
     public:
-        DayActions(GoalFunction* goalFunction_, std::vector<Action*> cl_types);
-        DayActions(DayActions& other);
+        DayActions(GoalFunction* goalFunction_, std::vector<const Action const*> cl_types, Factors start_factors_ = Factors(0,0));
+        DayActions(const DayActions& other);
 
-        virtual DayActions* randomDayActions();
+        virtual DayActions* randomDayActions() const;
 
         bool addAction(Action*);
         bool removeAction(Action*);
-        DayActions* replacePart(DayActions*, TimeRange);
+        DayActions* replacePart(const DayActions*, TimeRange&) const;
 
-        virtual std::string toString();
+        DayActions& operator=(const DayActions& other);
+
+        virtual std::string toString() const;
 
         virtual ~DayActions();
 };

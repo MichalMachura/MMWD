@@ -1,7 +1,7 @@
 #include "CoffeeAndSleepGoalFunction.hpp"
 
 Factors CoffeeAndSleepGoalFunction::getFactorsAt(int time, Factors start_factors, std::vector<Action*>* collection_)
-    {//needed is the penalty function
+    {
     if(time == 0)
         return start_factors;
 
@@ -10,17 +10,17 @@ Factors CoffeeAndSleepGoalFunction::getFactorsAt(int time, Factors start_factors
 
     for(int i = 0; i < collection_->size(); ++i)
         {
-        Action* x = *collection_[i]
+        Action* x = *collection_[i];
 
         if(x->getEnd() > time)
             {
             if(x->getBegin() <= time) // during of action x
                 {
-                if(dynamic_cast<Sleep*>(x))
+                if(dynamic_cast<Sleep*>(x) != nullptr)
                     {
                     return Factors({0,0})
                     }
-                else if(dynamic_cast<Coffee*>(x))
+                else if(dynamic_cast<Coffee*>(x) != nullptr)
                     {
                     return x->getFactorsAfter();
                     }

@@ -29,8 +29,14 @@ void DayActions::sort() //setting and removing flags
         }
     }
 
-DayActions* DayActions::replacePart(DayActions* other, TimeRange range)
+DayActions* DayActions::replacePart(const DayActions* other, TimeRange& range) const
     {
+    if(this->class_types != other.class_types)     //class types must be the same
+        throw std::string("\nObjects are contain different Action class types objects. Replace is impossible!\n");
+
+    if(range.getBegin() == range.getEnd())  //it's pointed range
+        return new DayActions(*this);
+
     bool with_one = rand()%2;
     DayActions* ans;
     DayActions* second;
@@ -66,9 +72,9 @@ DayActions* DayActions::replacePart(DayActions* other, TimeRange range)
     return ans;
     }
 
-Chromosome* DayActions::crossingOver(Chromosome* other)
+Chromosome* DayActions::crossingOver(const Chromosome* other) const
     {
-    DayActions1* second = dynamic_cast<DayActions1*>(other)
+    DayActions1* second = dynamic_cast<const DayActions1*>(other)
 
     if(!second)
         return nullptr;
@@ -82,7 +88,7 @@ Chromosome* DayActions::crossingOver(Chromosome* other)
     return replacePart(second,range);      //replace at the range
     }
 
-Chromosome* DayActions::mutation()
+Chromosome* DayActions::mutation() const
     {
     DayActions* ans = new DayActions(*this);    //our new object to mutation
     int max_length_to_mutation = 3*60;           //3 hours
@@ -133,7 +139,7 @@ Chromosome* DayActions::mutation()
     return ans;
     }
 
-std::vector<Action*>* DayActions::getPart(TimeRange& range)
+std::vector<Action*>* DayActions::getPart(TimeRange& range) const
     {
     if(range.getBegin() == range.getEnd())
         return new std::vector<Action*>;
@@ -270,7 +276,7 @@ bool DayActions::deleteRange(TimeRange& range)  //setting flag modified and remo
     return ans;
     }
 
-bool DayActions::setPart(std::vector<Action*>* part, Factors start_part_factors, TimeRange& range)   //it's delete the memory allocated for part - vector but not it's elements. they are copping to collection. collection is not sorted.
+bool DayActions::setPart(std::vector<Action*>* part, Factors& start_part_factors, TimeRange& range)   //it's delete the memory allocated for part - vector but not it's elements. they are copping to collection. collection is not sorted.
     {   //setting flag modified and removing updated_factors
     if(range.begin == range.end)
         return false;
@@ -295,7 +301,7 @@ bool DayActions::setPart(std::vector<Action*>* part, Factors start_part_factors,
     return ans;
     }
 
-Chromosome* DayActions::randomChromosome()
+Chromosome* DayActions::randomChromosome() const
     {
     return randomDayActions();
     }
@@ -324,7 +330,6 @@ bool DayActions::updateFactors()   //setting flag updated_factors
 
     return ans;
     }
-
 
 bool DayActions::checkRestrictionsAndRetake()   //removing modified and updated_factors
     {
@@ -369,12 +374,78 @@ bool DayActions::removeAction(Action* action)   //setting flag modified and remo
     return false;
     }
 
-double DayActions::goalFunction()   //return value of goal function
+double DayActions::goalFunction() const   //return value of goal function
     {
     if(modified)        //if was some modification
-        updateFactors();
+        updateFactors();///throw std::string("\nDayAction was not updated !\n");
 
     return goal_function_value;
     }
+
+void DayActions::deleteAllActions()
+    {
+    for(Action* x : collection) //deleting all Actions
+        delete x;
+    collection.clear();
+
+    modified  = true;       //setting and removing flags
+    updated_factors = false;
+    }
+
+DayActions::~DayActions()
+    {
+    deleteAllActions();
+
+    class_types.clear();    //deleting all class types objects
+    }
+
+DayActions::DayActions(GoalFunction* goalFunction_, std::vector<const Action const*> cl_types, Factors& start_factors_) : start_factors(start_factors_)
+    {
+    if(cl_types.empty())
+        throw std::string("\n cl_types is empty\n");
+
+    if(goalFunction_ == nullptr)
+        throw std::string("\ngoalFunction is nullptr\n");
+
+    for(const Action const* x : cl_types)
+        if(x == nullptr)
+            throw std::string("\n element of cl_types is nullptr\n");
+
+    goal_function = goalFunction_;
+    class_types = cl_types;
+
+    modified = true;
+    updated_factors = false;
+    goal_function_value = 0.0;
+    }
+
+DayActions& DayActions::operator=(const DayActions& other)
+    {
+    if(other.class_types != class_types)
+        throw std::string("\nObjects are contain different Action class types objects. Assignment is impossible!\n");
+
+    modified = other.modified;
+    updated_factors  =other.updated_factors;
+    start_factors  = other.start_factors;
+
+    goal_function = other.goal_function;
+    goal_function_value = other.goal_function_value;
+
+    //class_types = other.class_types; //assignment only values of addresses
+
+    deleteAllActions(); ///clearing the vector for new actions
+
+    for(Action* x : other.collection)   //cloning actions in the same order
+        collection.push_back(x.clone());
+    }
+
+DayActions::DayActions(const DayActions& other)
+    {
+    this->class_types = other.class_types;
+
+    *this = other;
+    }
+
+
 
 
