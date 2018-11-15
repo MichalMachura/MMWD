@@ -2,6 +2,8 @@
 #include "Chromosome.hpp"
 #include "GeneticAlgorithm.hpp"
 #include <time.h>
+#include "generateRandom.hpp"
+
 using namespace std;
 
 int main()

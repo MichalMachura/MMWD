@@ -312,17 +312,10 @@ bool DayActions::updateFactors()   //setting flag updated_factors
         checkRestrictionsAndRetake();
 
     bool ans = true;        // answer of upgrading modifiers
-    Factors previous = start_factors;   //previous factors and time when they are located
-    int previous_time = start_;
 
     for(Action* x : collection)
-        {
-        if(!(x->upgradeModifiers(&collection))) // if any returned false
+        if(!(x->update(&collection, start_factors))) // if any returned false
             ans = false;    // answer is false
-
-        previous = x->factorsAfter(previous,previous_time); //upgrading factors , setting previous factors
-        previous_time = x->getEnd();                                            // and they're time
-        }
 
     goal_function_value = countGoalFunction();
 

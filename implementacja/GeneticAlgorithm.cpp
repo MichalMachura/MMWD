@@ -4,15 +4,6 @@ GeneticAlgorithm::GeneticAlgorithm(std::ostream& output_, Chromosome* start_obje
     {
     //setting parameters of max VALUES variables of state
     setMaxValuesOfParameters(start_object,min_diffrence_between_generations_best_, NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_,max_of_iteration_, max_population_size_,max_best_, population_);
-
-    /*******************************************************/
-    srand(time(NULL)); // rand initialization
-
-    current_best_size = rand()%(max_best-MIN_BEST) + MIN_BEST;  //current sizes
-    current_population_size = MIN_POPULATION_SIZE + rand()%(max_population_size-MIN_POPULATION_SIZE);
-
-    if(population_.size() > current_population_size)
-        current_population_size = population_.size();
     }
 
 void GeneticAlgorithm::startRandomPopulation()
@@ -109,12 +100,11 @@ void GeneticAlgorithm::crossing(int places_for_crossing)
     {
     for(int i = 0; i < places_for_crossing; ++i)
         {
-        unsigned int r1 = rand()%current_best.size();
-        unsigned int r2 = rand()%current_best.size();
+        unsigned int r1 = generateRandom(0, current_best.size()-1);//rand()%current_best.size();
+        unsigned int r2 = generateRandom(0,current_best.size()-1);
 
         while(r2 == r1) // for the choosing the other chromosomes
-            r2 = rand()%current_best.size();
-
+            r2 = generateRandom(0,current_best.size()-1);
         Chromosome* ch;
         try
             {
@@ -134,7 +124,7 @@ void GeneticAlgorithm::mutation(int places_for_mutation)
 
     for(int i = 0; i < places_for_mutation; ++i)
         {
-        unsigned int r1 = rand()%current_best.size();
+        unsigned int r1 =  generateRandom(0,current_best.size()-1);
         Chromosome* ch;
         try
             {
@@ -151,15 +141,15 @@ void GeneticAlgorithm::mutation(int places_for_mutation)
 
 void GeneticAlgorithm::generateCurrentValuesOfState()
     {   //current mean in future generation
-    current_best_size = rand()%(max_best-MIN_BEST) + MIN_BEST;  //current best sizes
-    current_population_size = MIN_POPULATION_SIZE + rand()%(max_population_size-MIN_POPULATION_SIZE);   //current population size
+    current_best_size = generateRandom(MIN_BEST,max_best-1);//rand()%(max_best-MIN_BEST) + MIN_BEST;  //current best sizes
+    current_population_size = generateRandom(MIN_POPULATION_SIZE,max_population_size-1);//MIN_POPULATION_SIZE + rand()%(max_population_size-MIN_POPULATION_SIZE);   //current population size
     }
 
 void GeneticAlgorithm::countPlacesForCrossingAndMutation(int& places_for_crossing, int& places_for_mutation)
     {
     int free_places = current_population_size - population.size();
     //numbers of new cross-created chromosomes and for mutate-created. All is rand, but from the constant % range
-    places_for_crossing = (MIN_FOR_CROSSING + rand()%(MAX_FOR_CROSSING-MIN_FOR_CROSSING))/100.0*free_places;
+    places_for_crossing = generateRandom(MIN_FOR_CROSSING,MAX_FOR_CROSSING-1)/100.0*free_places;//(MIN_FOR_CROSSING + rand()%(MAX_FOR_CROSSING-MIN_FOR_CROSSING))/100.0*free_places;
     places_for_mutation = free_places - places_for_crossing;
     }
 
@@ -196,14 +186,14 @@ Chromosome* GeneticAlgorithm::startAlgorithm(bool display)
 
         while(current_iteration < max_of_iteration) //iteration condition
             {
+            //variables for result of counting places for crossing and mutation
+            int places_for_mutation, places_for_crossing;
             //previous best
             previous_best = current_best[0];
             //removing weak elements from population without strong elements
             removeWeak();
             //new population and next best size
             generateCurrentValuesOfState();
-            //variables for result of counting places for crossing and mutation
-            int places_for_mutation, places_for_crossing;
             //counting and generating number of crossing and mutation chromosomes which should be created
             countPlacesForCrossingAndMutation(places_for_crossing,places_for_mutation);     //variables are forwarding by reference
             //crossing

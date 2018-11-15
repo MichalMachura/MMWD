@@ -27,6 +27,7 @@ Ciag& Ciag::operator=(const Ciag& other)
 
     return *this;
     }
+
 double Ciag::goalFunction() const
     {
     double ans =0.0;
@@ -58,7 +59,6 @@ Chromosome* Ciag::crossingOver(const Chromosome* other) const
     if(other == nullptr)
         throw std::string("nullptr as a Chromosome* in crossingOver");
 
-
     const Ciag* other_ = dynamic_cast<const Ciag*>(other);
     Ciag* ch  =new Ciag();
 
@@ -66,7 +66,6 @@ Chromosome* Ciag::crossingOver(const Chromosome* other) const
         *ch =*this;
     else
         *ch = *other_;
-
 
     int r[3];               //searching for 3 vary random position in tab
     r[0] = rand()%length;

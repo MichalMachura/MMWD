@@ -7,14 +7,33 @@
 
 #include "generateRandom.hpp"
 
+GenerateRandom generateRandom = GenerateRandom();
 
-int generateRandom(int low, int high){
+bool GenerateRandom::is_initialized = false;
 
-	//srand(time(0));
-	int rndInt;
-	if (low>=0 && high>=low)
-		rndInt = rand() % (high-low+1) + low;
-	else
-		rndInt = 0;
-	return rndInt;
-}
+GenerateRandom::GenerateRandom()
+    {
+    if(!is_initialized)
+        {
+        srand(time(NULL));
+        is_initialized = true;
+        }
+    }
+
+int GenerateRandom::operator()(int low, int high)
+    {
+    /*if(!is_initialized) //jesi nie zainicjowane jakimœ trafem
+        {
+        srand(time(0));
+        is_initialized = true;
+        }*/
+
+    if(low > high)
+        {
+        int aux = low;
+        low = high;
+        high = aux;
+        }
+	//if (low>=0)   //przedzial nalezy do R
+    return (rand()%(high-low+1)) + low;
+    }
