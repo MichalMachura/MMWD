@@ -37,3 +37,8 @@ int GenerateRandom::operator()(int low, int high)
 	//if (low>=0)   //przedzial nalezy do R
     return (rand()%(high-low+1)) + low;
     }
+
+int GenerateRandom::operator()(int max_abs)
+    {
+    return operator()(0, max_abs);
+    }

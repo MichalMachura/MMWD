@@ -439,6 +439,35 @@ DayActions::DayActions(const DayActions& other)
     *this = other;
     }
 
+DayActions* DayActions::randomDayActions()
+    {//ranodm start_factors
+    Factors random_start(generateRandom(0,100),generateRandom(-100,0));
+    //returned object
+    DayActions* answer = new DayActions(this->goal_function,this->class_types,random_start);
 
+    //free ranges<=here can be located the action
+    std::vector<TimeRange> free_time_ranges;
+    //started range of full one day
+    free_time_ranges.push_back(TimeRange(start_,end_));
+
+    //number of action added to day
+    int number_of_actions = generateRandom(5,15);
+
+    for(int i = number_of_actions; i>0 ;--i)
+        {
+        Action* action;
+
+        int nr_range_in_vector = generateRandom(free_time_ranges.size()-1);
+        int range_length =  free_time_ranges[nr_range_in_vector].length();
+        int max_new_range_length = generateRandom(range_length * 0.5);
+        //po utworzeniu czynosci sparwdzic jej range
+
+
+        int random_Action_type = generateRandom(class_types.size()-1);
+
+        }
+
+
+    }
 
 

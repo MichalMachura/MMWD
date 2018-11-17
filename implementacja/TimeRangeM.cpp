@@ -33,3 +33,7 @@ int TimeRange::isEqual(TimeRange& second)
         return 0;
     }
 
+int TimeRange::length()
+    {
+    return end - begin;
+    }
