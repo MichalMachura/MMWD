@@ -78,6 +78,10 @@ public:
 	//GET FUNCTIONS:
 	double getY();
 	double getA();
+	
+	//SET FUNCTIONS:
+	void setY (double _y);
+
 
 
 	/* ALPH(int m)
