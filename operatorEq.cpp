@@ -5,6 +5,7 @@ DayActions& DayActions::operator=(const DayAction& second)
     DayActions first;   //zamiast first bardziej *this
                         //albo jak już to: DayActions& first = *this;
                         //i może zostać reszta wtedy bo mamy referencje
+                        //albo nawet nie potrzebne *this można usunąć first i returnować *this, bo składowe odwołują się do tego obiektu
     first.modified = second.modified;
     first.updated_factors = second.updated_factors;
     first.collection = second.collection;       //i to jest ta istotna rzecz dla której  był przeciążony operator=
