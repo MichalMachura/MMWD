@@ -97,6 +97,10 @@ double Factors::getA(){
 	return a;
 };
 
+void Factors::setY (double _y){
+	y = _y;
+};
+
 
 double Factors::alph(int m){
 	/*
