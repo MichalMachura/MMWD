@@ -1,5 +1,10 @@
 #include "DayActions.hpp"
 
+double DayActions::countGoalFunction()
+    {
+    return goal_function->goalFunction(vector<Action*>);
+    }
+
 void DayActions::sort() //setting and removing flags
     {
     bool flag = false;
@@ -12,7 +17,7 @@ void DayActions::sort() //setting and removing flags
 
             if(z > 0)// jesli aktualna i-ta pozycja jest wieksza od i+1-szej
                 {   //zamieniamy je
-                Action* temporary = collection[i];
+                Action* temporary = collectioSn[i];
                 collection[i] = collection[i+1];
                 collection[i+1] = temporary;
                 flag = true;    //ustwienie flagi gdy nast¹pi zmiana
@@ -31,8 +36,8 @@ void DayActions::sort() //setting and removing flags
 
 DayActions* DayActions::replacePart(const DayActions* other, TimeRange& range) const
     {
-    if(this->class_types != other.class_types)     //class types must be the same
-        throw std::string("\nObjects are contain different Action class types objects. Replace is impossible!\n");
+    if(this->class_types_and_check_function != other-class_types_and_check_function>     //class types must be the same
+        throw std::string("\nObjects are contain different Action class types and checkFunctions objects. Replace is impossible!\n");
 
     if(range.getBegin() == range.getEnd())  //it's pointed range
         return new DayActions(*this);
@@ -77,7 +82,10 @@ Chromosome* DayActions::crossingOver(const Chromosome* other) const
     DayActions1* second = dynamic_cast<const DayActions1*>(other)
 
     if(!second)
-        return nullptr;
+        {
+        DayActions* ans(*this);
+        return ans;
+        }
 
     int max_length_to_cross = end_/3;           //33% of a day
     int min_length_to_cross = 60;           //1 hour
@@ -332,7 +340,7 @@ bool DayActions::checkRestrictionsAndRetake()   //removing modified and updated_
 
     for(unsigned int i = 0; i < collection.size()-1; ++i)   //checking the overlap of times
         {
-        if(collection[i]->isEqual(*(collection[i+1]) == 0)      //overlapping
+        if(collection[i]->isEqual(collection[i+1]) == 0)      //overlapping
             {
             delete collection[i+1];
             collection.erase(collection.begin()+i+1);   //deleting element
@@ -343,8 +351,8 @@ bool DayActions::checkRestrictionsAndRetake()   //removing modified and updated_
             }
         }
 
-    for(Action* x : class_types)
-        if(!(x->checkRestrictionsAndRetake(&collection)))
+    for(Pair_shared_ptr_Action_checkingFunction x : class_types_and_check_function)
+        if(!(x.second(&collection)))
             ans = false;
 
     modified = false;   //setting flag
@@ -352,7 +360,7 @@ bool DayActions::checkRestrictionsAndRetake()   //removing modified and updated_
     return ans;
     }
 
-bool DayActions::removeAction(Action* action)   //setting flag modified and removing updated_factors
+bool DayActions::removeAction(const Action const* action)   //setting flag modified and removing updated_factors
     {
     auto iterator_ = find(collection.begin(),collection.end(),action);
 
@@ -375,11 +383,18 @@ double DayActions::goalFunction() const   //return value of goal function
     return goal_function_value;
     }
 
-void DayActions::deleteAllActions()
+void DayActions::deleteAllActionsAndGoalFunction()
     {
     for(Action* x : collection) //deleting all Actions
         delete x;
     collection.clear();
+
+    for( std::pair x : class_types_and_check_functions)     //
+        delete x.first;
+    class_types_and_check_functions.clear();
+
+    delete goal_function;
+    goal_function = nullptr;
 
     modified  = true;       //setting and removing flags
     updated_factors = false;
@@ -387,46 +402,41 @@ void DayActions::deleteAllActions()
 
 DayActions::~DayActions()
     {
-    deleteAllActions();
-
-    class_types.clear();    //deleting all class types objects
+    deleteAllActionsAndGoalFunction();
     }
 
-DayActions::DayActions(GoalFunction* goalFunction_, std::vector<const Action const*> cl_types, Factors& start_factors_) : start_factors(start_factors_)
+DayActions::DayActions(std::shared_ptr<GoalFunction> goalFunction_, std::vector<std::pair<std::shared_ptr<const Action>,const checkingFunction>>& cl_types_checkFun, Factors& start_factors_) : start_factors(start_factors_)
     {
-    if(cl_types.empty())
-        throw std::string("\n cl_types is empty\n");
+    if(cl_types_checkFun.empty())
+        throw std::string("\ncl_types_checkFun is empty\n");
 
-    if(goalFunction_ == nullptr)
+    if(!goalFunction_)
         throw std::string("\ngoalFunction is nullptr\n");
 
-    for(const Action const* x : cl_types)
-        if(x == nullptr)
-            throw std::string("\n element of cl_types is nullptr\n");
+    for(Pair_shared_ptr_Action_checkingFunction x : cl_types_checkFun)   //checking input vector for nullptr elements
+        if(!(x->first) || x->second == nullptr) //if object or fun is nullptr
+            throw std::string("\ncl_types_checkFun contain nullptr Action* or checkingFunction\n");
 
-    goal_function = goalFunction_;
-    class_types = cl_types;
+    class_types_and_check_functions = cl_types_checkFun;
+    goal_function = goalFunction;
 
-    modified = true;
-    updated_factors = false;
+    modified = false;
+    updated_factors = true;
     goal_function_value = 0.0;
     }
 
 DayActions& DayActions::operator=(const DayActions& other)
     {
-    if(other.class_types != class_types)
-        throw std::string("\nObjects are contain different Action class types objects. Assignment is impossible!\n");
+    deleteAllActions(); //clearing the vector for new actions
+
+    class_types_and_check_functions = other.class_types_and_check_functions;
 
     modified = other.modified;
-    updated_factors  =other.updated_factors;
+    updated_factors = other.updated_factors;
     start_factors  = other.start_factors;
 
     goal_function = other.goal_function;
     goal_function_value = other.goal_function_value;
-
-    //class_types = other.class_types; //assignment only values of addresses
-
-    deleteAllActions(); ///clearing the vector for new actions
 
     for(Action* x : other.collection)   //cloning actions in the same order
         collection.push_back(x.clone());
@@ -434,8 +444,6 @@ DayActions& DayActions::operator=(const DayActions& other)
 
 DayActions::DayActions(const DayActions& other)
     {
-    this->class_types = other.class_types;
-
     *this = other;
     }
 
