@@ -3,6 +3,7 @@
 #include "generateRandom.hpp"
 #include <cmath>
 #include <ostream>
+#include<iomanip>
 
 
 /* ---------- FACTORS -----------*/
@@ -31,7 +32,7 @@ public:
     void setA (double _a);
 
 	Factors& operator=(const Factors&);
-    friend std::ostream& operator<<(std::ostream& out, Factors& obj);
+    friend std::ostream& operator<<(std::ostream& out, const Factors& obj);
 };
 
 

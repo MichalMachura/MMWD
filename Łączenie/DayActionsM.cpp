@@ -1,14 +1,13 @@
 #include "DayActions.hpp"
 
-double DayActions::countGoalFunction()
-    {
-    return goal_function->goalFunction(vector<Action*>);
-    }
-
 void DayActions::sort() //setting and removing flags
     {
+    if(collection.empty())
+        return;
+
     bool flag = false;
     int i = 0, j = 0;
+
     for(int j = collection.size()-1; j > 0; --j)
         {
         for(int i = 0; i < j; i++) //i-te pozycje to od 0 do j-otej
@@ -17,7 +16,7 @@ void DayActions::sort() //setting and removing flags
 
             if(z > 0)// jesli aktualna i-ta pozycja jest wieksza od i+1-szej
                 {   //zamieniamy je
-                Action* temporary = collectioSn[i];
+                Action* temporary = collection[i];
                 collection[i] = collection[i+1];
                 collection[i+1] = temporary;
                 flag = true;    //ustwienie flagi gdy nast¹pi zmiana
@@ -32,43 +31,96 @@ void DayActions::sort() //setting and removing flags
 
         flag = false;   //reset flagi, gdy jest ustawiona dla nastêpnej pêtli
         }
+
+    deleteOverlapping();
+    }
+
+void DayActions::deleteOverlapping()
+    {
+    if(collection.empty())
+        return;
+
+    bool ans = false;
+    for(int z = 0; z < collection.size(); ++z)
+        {
+        for(int i = 0; i < int(collection.size())-1; ++i)
+            if(collection[i]->isEqual(collection[i+1]) == 0)
+                {
+                if(collection[i]->getBegin() >= collection[i+1]->getBegin() && collection[i]->getEnd() <= collection[i+1]->getEnd())
+                    {//i is contained in i+1
+                    delete collection[i];
+                    collection[i] = nullptr;
+                    collection.erase(collection.begin()+ i);
+                    --i;
+                    ans = true;
+                    }
+                else if(collection[i]->getBegin() <= collection[i+1]->getBegin() && collection[i]->getEnd() >= collection[i+1]->getEnd())
+                    {//i+1 is contained in i
+                    delete collection[i+1];
+                    collection[i+1] = nullptr;
+                    collection.erase(collection.begin()+ i+1);
+                    ans = true;
+                    }
+                else if(collection[i]->getBegin() >= collection[i+1]->getBegin())//only overlapping
+                    {
+                    Action* temporary = collection[i];
+                    collection[i] = collection[i+1];
+                    collection[i+1] = temporary;
+                    ans = true;
+                    }
+                }
+
+        if(ans)
+            {
+            modified = true;        //setting and removing flags
+            updated_factors = false;
+            ans = false;
+            continue;
+            }
+        else
+            break;
+        }
     }
 
 DayActions* DayActions::replacePart(const DayActions* other, TimeRange& range) const
     {
-    if(this->class_types_and_check_function != other-class_types_and_check_function>     //class types must be the same
+    if(this->class_types_and_check_functions != other->class_types_and_check_functions)     //class types must be the same
         throw std::string("\nObjects are contain different Action class types and checkFunctions objects. Replace is impossible!\n");
 
     if(range.getBegin() == range.getEnd())  //it's pointed range
         return new DayActions(*this);
 
-    bool with_one = rand()%2;
     DayActions* ans;
-    DayActions* second;
+    const DayActions* second;
+    std::vector<Action*>* part;
+    Factors part_start_factors;
 
-    if(with_one)    //if answer is based on first
+    if(generateRandom(1))    //if answer is based on first
         {
+        //std::cout<<"Base from rDA1\n";
         ans = new DayActions(*this);
         second = other;
         }
     else            //if answer is based on second
         {
+        //std::cout<<"Base from rDA2\n";
         ans = new DayActions(*other);
         second = this;
         }
 
-    std::vector<Action*>* part = second->getPart(range);        //getting part from second
-    Factors part_start_factors = second->goal_function->getFactorsAt(range.getBegin(),&(second->start_factors,second->collection)); //pasting it to first at the range
+    part = second->getPart(range);        //getting part from second
+    part_start_factors = second->goal_function->getFactorsAt(range.getBegin(),second->start_factors,&(second->collection)); //pasting it to first at the range
 
-    if(!ans->setPart(part, part_start_factors, range))      //problems with deleting
+    if(!ans->deleteRange(range))      //problems with deleting
         {
         *ans = *this;
         return ans;
         }
 
+    ans->setPart(part, part_start_factors, range);
     ans->sort();
-
-    if(!(ans->checkRestrictionsAndRetake()) || !(ans->upgradeFactors()))        //if is not correct or cannot be updated
+    ans->deleteOverlapping();
+    if(!(ans->checkRestrictionsAndRetake()) || !(ans->updateFactors()))        //if is not correct or cannot be updated
         {
         *ans = *this;
         return ans;
@@ -79,11 +131,11 @@ DayActions* DayActions::replacePart(const DayActions* other, TimeRange& range) c
 
 Chromosome* DayActions::crossingOver(const Chromosome* other) const
     {
-    DayActions1* second = dynamic_cast<const DayActions1*>(other)
+    const DayActions* second = dynamic_cast<const DayActions*>(other);
 
     if(!second)
         {
-        DayActions* ans(*this);
+        DayActions* ans = new DayActions(*this);
         return ans;
         }
 
@@ -92,7 +144,7 @@ Chromosome* DayActions::crossingOver(const Chromosome* other) const
     int length_to_cross = generateRandom(min_length_to_cross, max_length_to_cross);       //random length crossed time range
 
     TimeRange range = TimeRange::randomTimeRange(start_,end_, length_to_cross);
-
+    //std::cout<<"Range: "<<range<<"\n";
     return replacePart(second,range);      //replace at the range
     }
 
@@ -102,21 +154,25 @@ Chromosome* DayActions::mutation() const
     int max_length_to_mutation = 3*60;           //3 hours
     int min_length_to_mutation = 60;           //1 hour
     int length_to_mutation = generateRandom(min_length_to_mutation,max_length_to_mutation);       //random length crossed time range
+    std::vector<Action*>* help_vector1, *help_vector2;
+    TimeRange t1, t2;
 
-    TimeRange t1 = TimeRange::randomTimeRange(start_, end_, length_to_mutation);    //random time ranges
-    TimeRange t2 = TimeRange::randomTimeRange(start_, end_, length_to_mutation);
+    t1 = TimeRange::randomTimeRange(start_, end_, length_to_mutation);    //random time ranges
+    t2 = TimeRange::randomTimeRange(start_, end_, length_to_mutation);
 
     while(t1.isEqual(t2) == 0)      //first should not contain second
         t2 = TimeRange::randomTimeRange(start_, end_, length_to_mutation);
 
+    Factors factors_1 = goal_function->getFactorsAt(t1.getBegin(),start_factors,&collection);    // taking factors at point at time of begin range
+    Factors factors_2 = goal_function->getFactorsAt(t2.getBegin(),start_factors,&collection);
 
-    Factors factors_1 = goal_function->getFactorsAt(t1.getBegin(),start_factors,*collection);    // taking factors at point at time of begin range
-    Factors factors_2 = goal_function->getFactorsAt(t2.getBegin(),start_factors,*collection);
+    help_vector1 = getPart(t1);   //taking part from range
+    help_vector2 = getPart(t2);
 
-    std::vector<Action*>* help_vector1 = getPart(t1);   //taking part from range
-    std::vector<Action*>* help_vector2 = getPart(t2);
+    adjustToNextRange(help_vector1,t1,t2); //setting new times in actions
+    adjustToNextRange(help_vector2,t2,t1);
 
-    if(!ans->setPart(help_vector1,factors_1,t2)) // error with deleting
+    if(!ans->deleteRange(t1) || !ans->deleteRange(t2)) // error from deleting
         {
         for(Action* x : *help_vector1)
             delete x;
@@ -127,24 +183,36 @@ Chromosome* DayActions::mutation() const
         return ans;
         }
 
-    if(!ans->setPart(help_vector2,factors_2,t1))    //error with deleting
-        {
-        for(Action* x : *help_vector1)
-            delete x;
-        for(Action* x : *help_vector2)
-            delete x;
+    ans->setPart(help_vector1,factors_1,t2);    //paste rescaled actions to opposite ranges
+    ans->setPart(help_vector2,factors_2,t1);
 
-        *ans = *this;
-        return ans;
+    if(generateRandom(2))   //probability of adding new action is 0.5
+        ans->addRandomAction();
+
+    if(!collection.empty() && generateRandom(2))    //deleting random action
+        {
+        int nr = generateRandom(collection.size()-1);
+
+        delete ans->collection[nr];
+        ans->collection.erase(ans->collection.begin() + nr);
         }
 
     ans->sort();
 
-    if(!(ans->checkRestrictionsAndRetake()) || !(ans->upgradeFactors()))   //if it cannot be corrected or be updated
+    if((!ans->checkRestrictionsAndRetake()) || !(ans->updateFactors()) )   //if it cannot be corrected or be updated
         *ans = *this;
 
 
+//std::cout<<"Mutation:\nTR1: "<<t1<<"\nTR2: "<<t2<<"\nis: "<<"\n";
     return ans;
+    }
+
+void DayActions::adjustToNextRange(std::vector<Action*>* vec, TimeRange& previous, TimeRange& next)
+    {
+    int added_time = next.getBegin() - previous.getBegin();
+
+    for(Action* x : *vec)
+        x->setBeginEnd(x->getBegin() + added_time, x->getEnd() + added_time);
     }
 
 std::vector<Action*>* DayActions::getPart(TimeRange& range) const
@@ -154,9 +222,9 @@ std::vector<Action*>* DayActions::getPart(TimeRange& range) const
 
     std::vector<Action*>* part = new std::vector<Action*>;
 
-    for(Action* x : *collection)
+    for(Action* x : collection)
         {
-        if(x->getEnd() < range.getBegin())
+        if(x->getEnd() < range.getBegin())  //action before the range
             {
             continue;
             }
@@ -164,43 +232,36 @@ std::vector<Action*>* DayActions::getPart(TimeRange& range) const
             {
             part->push_back(x->clone());
             }
-        else if(x->getBegin() < range.getBegin() && x->getEnd()> range.getBegin())        //2
+        else if(x->getBegin() <= range.getBegin() && range.getBegin() <= x->getEnd())        //2
             {
             //in part it belongs to range -> left end
-            if(range.getEnd() < x->getEnd())    //x contain whole range with range's ends
+            if(range.getEnd() <= x->getEnd())    //x contain whole range with range's ends
                 {
                 Action* aux = x->clone();
-                aux->setBegin(range.getBegin());
-                aux->setEnd(range.getEnd());
+                aux->setBeginEnd(range.getBegin(),range.getEnd());
                 part->push_back(aux);
-                break;
+                return part;
                 }
-            else    //x->getEnd()<= range.end   //range contain part with end of x and perhaps something more
+            else    //x->getEnd()< range.end   //range contain part with end of x and perhaps something more
                 {
                 Action* aux = x->clone();
                 aux->setBegin(range.getBegin());
                 part->push_back(aux);
+                continue;   //part from first action go to next
                 }
             }
-        else if(x->getBegin() < range.getEnd() && x->getEnd() >= range.getEnd())        //30
+        else if(x->getBegin() < range.getEnd() &&  range.getEnd() <= x->getEnd())        //30
             {
             //in part it belongs to range -> right end
-            if(x->getBegin() < range.getBegin() )//x contain whole range with range's ends
-                {
-                Action* aux = x->clone();
-                aux->setBegin(range.getBegin());
-                aux->setEnd(range.getEnd());
-                part->push_back(aux);
-                }
-            else    //range.begin <= x->getBegin()   //range contain part with begin of x and perhaps something more
-                {
-                Action* aux = x->clone()
-                aux->setEnd(range.getEnd());
-                part->push_back(aux);
-                }
-            break;  //it's last possible action part
+            //range.begin < x->getBegin()   //range contain part with begin of x and perhaps something more
+
+            Action* aux = x->clone();
+            aux->setEnd(range.getEnd());
+            part->push_back(aux);
+
+            return part;  //it's last possible action part
             }
-        else if(range.end <= x->getBegin())
+        else if(range.getEnd() <= x->getBegin())
             break;  //after last possible action
         }
 
@@ -209,27 +270,29 @@ std::vector<Action*>* DayActions::getPart(TimeRange& range) const
 
 bool DayActions::deleteRange(TimeRange& range)  //setting flag modified and removing updated_factors
     {
+    if(range.getBegin() == range.getEnd())
+        return true;
+
     bool ans = true;
     int first = 0, num_to_erase = 0;
 
     for(int i = 0; i < collection.size() ; ++i)
         {
-        Action* x = *part[i];
+        Action* x = collection[i];
 
         if(x->getEnd() < range.getBegin())
             {
             continue;
             }
-        else if(x->getBegin() >= range.getBegin() && x->getEnd()< range.getEnd())  //full x action is containing at range
+        else if(range.getBegin() <= x->getBegin() && x->getEnd()< range.getEnd())  //full x action is containing at range
             {
             delete x;
-
             if(num_to_erase++ == 0)
                 {
                 first = i;    //adding index to later delete from collection a pointer value
                 }
             }
-        else if(x->getBegin() < range.getBegin() && x->getEnd()> range.getBegin())        //2
+        else if(x->getBegin() < range.getBegin() && range.getBegin() < x->getEnd())        //2
             {
             //in part it belongs to range -> left end
             if(range.getEnd() < x->getEnd())    //x contain whole range with range's ends => dividing this action for 2 actions
@@ -241,13 +304,15 @@ bool DayActions::deleteRange(TimeRange& range)  //setting flag modified and remo
 
                 break;  //end of range
                 }
-            else    //x->getEnd()<= range.end   //range contain part with end of x and perhaps something more
+            else    //x->getEnd()<= range.end   //range contain part of x from the interior of x to end of x and can have more actions
                 {
-                Action* second = x->divideByRange(TimeRange({range.getBegin(),x->getEnd()}));
+                TimeRange tr(range.getBegin(),x->getEnd());
+                Action* second = x->divideByRange(tr);
 
                 if(second != nullptr)       //second should be nullptr, but if it's not
                     ans = false;
                 }
+                //it's not end, there can be some actions.
             }
         else if(x->getBegin() < range.getEnd() && x->getEnd() >= range.getEnd())        //3
             {
@@ -261,14 +326,15 @@ bool DayActions::deleteRange(TimeRange& range)  //setting flag modified and remo
 
                 break;  //end of range
                 }
-            else    //range.begin <= x->getBegin()   //range contain part with begin of x and perhaps something more
+            else    //range.begin <= x->getBegin()   //range contain part with begin of x and but range end is less than x.end
                 {
-                Action* second = x->divideByRange(TimeRange({x->getBegin(),range.getEnd()}));
+                TimeRange tr(x->getBegin(),range.getEnd());
+                Action* second = x->divideByRange(tr);
 
                 if(second != nullptr)       //second should be nullptr, but if it's not
                     ans = false;
                 }
-            break;  //it's last possible action part
+            break;  //it was last possible action part
             }
         else if(range.getEnd() <= x->getBegin())
             break;  //after last possible action
@@ -284,14 +350,12 @@ bool DayActions::deleteRange(TimeRange& range)  //setting flag modified and remo
     return ans;
     }
 
-bool DayActions::setPart(std::vector<Action*>* part, Factors& start_part_factors, TimeRange& range)   //it's delete the memory allocated for part - vector but not it's elements. they are copping to collection. collection is not sorted.
+void DayActions::setPart(std::vector<Action*>* part, Factors& start_part_factors, TimeRange& range)   //it's delete the memory allocated for part - vector but not it's elements. they are copping to collection. collection is not sorted.
     {   //setting flag modified and removing updated_factors
-    if(range.begin == range.end)
-        return false;
+    if(range.getBegin() == range.getEnd())
+        return ;
 
-    bool ans = deleteRange(range);
-
-    if(range.begin == 0)
+    if(range.getBegin() == 0)
         start_factors = start_part_factors;
 
     for(Action* x : *part)
@@ -305,8 +369,6 @@ bool DayActions::setPart(std::vector<Action*>* part, Factors& start_part_factors
 
     modified = true;        //setting and removing flags
     updated_factors = false;
-
-    return ans;
     }
 
 Chromosome* DayActions::randomChromosome() const
@@ -325,9 +387,9 @@ bool DayActions::updateFactors()   //setting flag updated_factors
         if(!(x->update(&collection, start_factors))) // if any returned false
             ans = false;    // answer is false
 
-    goal_function_value = countGoalFunction();
-
     updated_factors = true; //setting flag
+
+    goal_function_value = goalFunction();
 
     return ans;
     }
@@ -338,20 +400,7 @@ bool DayActions::checkRestrictionsAndRetake()   //removing modified and updated_
 
     sort();
 
-    for(unsigned int i = 0; i < collection.size()-1; ++i)   //checking the overlap of times
-        {
-        if(collection[i]->isEqual(collection[i+1]) == 0)      //overlapping
-            {
-            delete collection[i+1];
-            collection.erase(collection.begin()+i+1);   //deleting element
-            --i;    //decrement i to compare current element with element next to deleted
-
-            modified = true;        //setting and removing flags
-            updated_factors = false;
-            }
-        }
-
-    for(Pair_shared_ptr_Action_checkingFunction x : class_types_and_check_function)
+    for(Pair_shared_ptr_Action_checkingFunction x : class_types_and_check_functions)
         if(!(x.second(&collection)))
             ans = false;
 
@@ -360,27 +409,28 @@ bool DayActions::checkRestrictionsAndRetake()   //removing modified and updated_
     return ans;
     }
 
-bool DayActions::removeAction(const Action const* action)   //setting flag modified and removing updated_factors
+bool DayActions::removeAction(Action* action)   //setting flag modified and removing updated_factors
     {
-    auto iterator_ = find(collection.begin(),collection.end(),action);
+    for(int i = 0; i< collection.size(); ++i)
+        if(action == collection[i])
+            {
+            modified = true;    // setting flag
+            updated_factors = false;
+            collection.erase(collection.begin()+i);
+            updateFactors();    //updating
 
-    if(iterator_ != collection.end())
-        {
-        modified = true;    // setting flag
-        updated_factors = false;
-        collection.erase(iterator_);
-        return true;
-        }
+            return true;
+            }
 
     return false;
     }
 
 double DayActions::goalFunction() const   //return value of goal function
     {
-    if(modified)        //if was some modification
-        updateFactors();///throw std::string("\nDayAction was not updated !\n");
+    if(!updated_factors)        //if was some modification
+        throw(std::string("Call to double \'DayAction::goalFunction() const\' without update."));//updateFactors();
 
-    return goal_function_value;
+    return goal_function->goalFunction(&collection,start_factors);
     }
 
 void DayActions::deleteAllActionsAndGoalFunction()
@@ -389,11 +439,8 @@ void DayActions::deleteAllActionsAndGoalFunction()
         delete x;
     collection.clear();
 
-    for( std::pair x : class_types_and_check_functions)     //
-        delete x.first;
     class_types_and_check_functions.clear();
 
-    delete goal_function;
     goal_function = nullptr;
 
     modified  = true;       //setting and removing flags
@@ -405,7 +452,7 @@ DayActions::~DayActions()
     deleteAllActionsAndGoalFunction();
     }
 
-DayActions::DayActions(std::shared_ptr<GoalFunction> goalFunction_, std::vector<std::pair<std::shared_ptr<const Action>,const checkingFunction>>& cl_types_checkFun, Factors& start_factors_) : start_factors(start_factors_)
+DayActions::DayActions(std::shared_ptr<GoalFunction> goalFunction_, const std::vector<Pair_shared_ptr_Action_checkingFunction>& cl_types_checkFun, const Factors& start_factors_) : start_factors(start_factors_)
     {
     if(cl_types_checkFun.empty())
         throw std::string("\ncl_types_checkFun is empty\n");
@@ -414,11 +461,14 @@ DayActions::DayActions(std::shared_ptr<GoalFunction> goalFunction_, std::vector<
         throw std::string("\ngoalFunction is nullptr\n");
 
     for(Pair_shared_ptr_Action_checkingFunction x : cl_types_checkFun)   //checking input vector for nullptr elements
-        if(!(x->first) || x->second == nullptr) //if object or fun is nullptr
+        if(!(x.first) || x.second == nullptr) //if object or fun is nullptr
             throw std::string("\ncl_types_checkFun contain nullptr Action* or checkingFunction\n");
 
-    class_types_and_check_functions = cl_types_checkFun;
-    goal_function = goalFunction;
+    //class_types_and_check_functions = cl_types_checkFun;
+    for(Pair_shared_ptr_Action_checkingFunction x : cl_types_checkFun)
+        class_types_and_check_functions.push_back(Pair_shared_ptr_Action_checkingFunction(x.first,x.second));
+
+    goal_function = goalFunction_;
 
     modified = false;
     updated_factors = true;
@@ -427,9 +477,10 @@ DayActions::DayActions(std::shared_ptr<GoalFunction> goalFunction_, std::vector<
 
 DayActions& DayActions::operator=(const DayActions& other)
     {
-    deleteAllActions(); //clearing the vector for new actions
+    deleteAllActionsAndGoalFunction(); //clearing the vector for new actions
 
-    class_types_and_check_functions = other.class_types_and_check_functions;
+    for(Pair_shared_ptr_Action_checkingFunction x : other.class_types_and_check_functions)
+        class_types_and_check_functions.push_back(Pair_shared_ptr_Action_checkingFunction(x.first,x.second));
 
     modified = other.modified;
     updated_factors = other.updated_factors;
@@ -439,7 +490,7 @@ DayActions& DayActions::operator=(const DayActions& other)
     goal_function_value = other.goal_function_value;
 
     for(Action* x : other.collection)   //cloning actions in the same order
-        collection.push_back(x.clone());
+        collection.push_back(x->clone());
     }
 
 DayActions::DayActions(const DayActions& other)
@@ -447,42 +498,94 @@ DayActions::DayActions(const DayActions& other)
     *this = other;
     }
 
-DayActions* DayActions::randomDayActions()
-    {//ranodm start_factors
-    Factors random_start(generateRandom(0,100),generateRandom(-100,0));
-    //returned object
-    DayActions* answer = new DayActions(this->goal_function,this->class_types,random_start);
+DayActions* DayActions::randomDayActions() const
+    {
+    Factors random_start(generateRandom(0,100),generateRandom(-10000,0)/1000.0); //random start_factors
+    DayActions* answer = new DayActions(this->goal_function, this->class_types_and_check_functions,random_start);    //returned object
 
-    //free ranges<=here can be located the action
-    std::vector<TimeRange> free_time_ranges;
-    //started range of full one day
-    free_time_ranges.push_back(TimeRange(start_,end_));
+    if(answer == nullptr)
+        throw "Random DayAction is equal nullptr.\n";
 
-    //number of action added to day
-    int number_of_actions = generateRandom(5,15);
+    int number_of_actions = generateRandom(3,10);   //number of action added to day
 
-    for(int i = number_of_actions; i>0 ;--i)
-        {
-        Action* action;
+    for(int i = 0; i <number_of_actions ; i++)
+        answer->addRandomAction();  //adding random Action
 
-        //generate random range from vector of ranges
-        int nr_range_in_vector = generateRandom(free_time_ranges.size()-1);
-        TimeRange max_range = free_time_ranges[nr_range_in_vector]; //range from whose will be range of new action
-
-        //generate max length of new range as random from 0 to half of range_length
-        int max_new_range_length = generateRandom(max_range.length() * 0.5);
-
-        TimeRange range = TimeRange::randomTimeRange(free_time_ranges[nr_range_in_vector].getBegin(),)
+    answer->updated_factors = false;
+    answer->modified = true;
 
 
-        int random_Action_type = generateRandom(class_types.size()-1);
+    answer->updateFactors();
 
-        }
-
-
+    return answer;
     }
 
+TimeRange findMaxFreeTimeRange(const std::vector<Action*>& collection, int start, int end)  //must be sorted and overlapping must be deleted
+    {                                                                                                   //finding first the biggest range
+    if(collection.empty())
+        return TimeRange(start,end);
 
+    TimeRange current_max_range(start,collection[0]->getBegin());  //for start to saving the best range
+    int previous_end = collection[0]->getEnd();     //ending of previous action
+
+    for(int i = 1; i < collection.size(); ++i)
+        {
+        Action* x = collection[i];
+
+        if(x->getBegin() - previous_end > current_max_range.length())   //if this is larger than previous
+            {
+            current_max_range(previous_end,x->getBegin());
+            }
+
+            previous_end = x->getEnd();
+        }
+
+    if(end - previous_end > current_max_range.length())   //if this is larger than previous
+        {
+        current_max_range(previous_end,end);
+        previous_end = end;
+        }
+
+    return current_max_range;
+    }
+
+TimeRange DayActions::getMaxFreeTimeRange()
+    {
+    if(modified)
+        {
+        sort();             //sorting and deleting overlapping, because it's outside interface
+        }
+
+    return findMaxFreeTimeRange(collection, start_,end_);
+    }
+
+void DayActions::addRandomAction()
+    {
+    TimeRange range = getMaxFreeTimeRange();    //the largest free range
+    TimeRange random_part_of_range = TimeRange::randomTimeRange(range.getBegin(),range.getEnd());   // randomizing a part from the largest range
+    int random_type_num = generateRandom(0,class_types_and_check_functions.size()-1); //choosing type of action
+
+    Action* addedAction = class_types_and_check_functions[random_type_num].first->randomAction(random_part_of_range); //creating random action
+
+    modified = true;
+    updated_factors = false;
+
+    collection.push_back(addedAction);  //adding
+    }
+
+std::string DayActions::toString() const
+    {
+    std::stringstream str;
+    str<<"DayActions: \n"<<"Start factors:\n"<<start_factors<<"\nCollection:\n";
+
+    for(Action* x : collection)
+        str<<x->toString();
+
+    str<<"\nFlags:\nmodified: "<<modified<<"\nupdated_factors: "<<updated_factors<<"\n";
+    str<<"goal function value => "<<goal_function_value<<" <=\n";
+
+    return str.str();
+    }
 
 
 

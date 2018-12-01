@@ -37,33 +37,28 @@ bool Sleep::checkRestrictionAndRetake(std::vector<Action*>* collection){
 	for (unsigned int i = 0; i < collection->size(); i++){
 		Sleep* item = dynamic_cast<Sleep*>((*collection)[i]);
 		if(item){
-			TimeRange i_TR;
-			i_TR= (*collection)[i]->getTimeRange();
-			int len_item = i_TR.length();
-			sumSleep += len_item;
+			sumSleep += item->begin_end.length();
 			counter++;
 			if (counter==2){
-				TimeRange firstTR;
-				firstTR = (*collection)[i-1]->getTimeRange();
-				TimeRange secondTR;
-				secondTR = (*collection)[i]->getTimeRange();
+				TimeRange firstTR = (*collection)[i-1]->getTimeRange();
+				TimeRange secondTR = item->getTimeRange();
+
 				int firstBeg=firstTR.getBegin();
 				int firstEnd=firstTR.getEnd();
 				int scndBeg=secondTR.getBegin();
 				int scndEnd=secondTR.getEnd();
 
-				if (firstEnd >= scndBeg){
+				if (firstEnd >= scndBeg){   //jesli koniec wczesniejszej >= poczotek nastepnej
 					//lacze dwa sny w jedno action
 
 					int newBegin =  (firstBeg<=scndBeg) ? firstBeg : scndBeg;
 					int newEnd = (firstEnd>= scndEnd) ?  firstEnd : scndEnd;
 
-
 					(*collection)[i-1]->setTimeRange(newBegin,newEnd);
-					delete (*collection)[i];
-					collection->erase(collection->begin()+i);
+					delete (*collection)[i];    //usuniecie tej czynnosci
+					collection->erase(collection->begin()+i);   //usuniecie z wektora
 
-					i--;
+					--i;
 				}
 				counter --;
 			}
@@ -71,8 +66,21 @@ bool Sleep::checkRestrictionAndRetake(std::vector<Action*>* collection){
 		else
 			counter = 0;
 	}
+
+	for(int i = 0; i < collection->size(); ++i)
+        {
+        Sleep* sl = dynamic_cast<Sleep*>((*collection)[i]);
+        if(sl != nullptr && sl->begin_end.length() < MIN_SLEEP)
+            {
+            sumSleep-=sl->begin_end.length();
+            delete sl;
+            collection->erase(collection->begin() + i);
+            --i;
+            }
+        }
+
 	if (sumSleep < MIN_DAY_SLEEP)
-		return false;
+		return true;
 	else
 		return true;
 };
@@ -89,10 +97,10 @@ Factors Sleep::factorsAfter(){
 
 
 string Sleep::toString() const{
-	string text = "SLEEP"+string("\t")+"START: "+ minToString(begin_end.getBegin())
-			+ string("\t")+"STOP: "+minToString(begin_end.getEnd()) +string("\t")
-			+ "Length: " + minToString(begin_end.length()) + string("\n");
-	return text;
+	std::stringstream text;
+    text<<"SLEEP:\t"<<Action::toString()<<"\tLength: "<<minToString(begin_end.length())<<"\n";
+
+	return text.str();
 };
 
 
@@ -119,15 +127,24 @@ Action* Sleep::clone() const{
 }
 
 
-Action* Sleep::dividingByRange(TimeRange &range){
-	if (range.getBegin() > this->begin_end.getBegin()  &&  range.getEnd() < this->begin_end.getEnd()){
+Action* Sleep::divideByRange(TimeRange &range){
+	if (this->begin_end.getBegin() < range.getBegin() && range.getEnd() < this->begin_end.getEnd()){
 		Sleep * ptrSleep;
 		ptrSleep = new Sleep(range.getEnd(), this->begin_end.getEnd());
 
 		this->begin_end.setEnd(range.getBegin());
 		return ptrSleep;
-
 	}
-	else // kiedy range nie zawiera się w czasie trwania snu:
+	else if(this->begin_end.getBegin() < range.getBegin() && this->begin_end.getEnd() <= range.getEnd())
+        {
+        begin_end.setEnd(range.getBegin());
+        return nullptr;
+        }
+	else if(range.getBegin() <= this->begin_end.getBegin() && range.getEnd() < this->begin_end.getEnd())
+        {
+        begin_end.setBegin(range.getEnd());
+        return nullptr;
+        }
+	else // kiedy range nie zawiera się w czasie trwania snu oraz gdy range zawiera cały sen!!!
 		return nullptr;
 }

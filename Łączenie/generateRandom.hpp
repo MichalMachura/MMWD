@@ -30,7 +30,10 @@ class GenerateRandom
         GenerateRandom();
         int operator()(int low, int high);  //losowanie z przedzi³u [low ; high] z high wlacznie
 
-        inline int operator()(int max_abs);    //losowanie z przedzia³u [0; max_abs] z max_abs wlacznie max_abs wartosc maxymalna bezwzglednie(alewartosc moze byc ujemna)
+        int operator()(int max_abs)    //losowanie z przedzia³u [0; max_abs] z max_abs wlacznie max_abs wartosc maxymalna bezwzglednie(alewartosc moze byc ujemna)
+            {
+            return operator()(0, max_abs);
+            }
 
         int operator()()
             {

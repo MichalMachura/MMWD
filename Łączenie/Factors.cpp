@@ -49,13 +49,9 @@ Factors& Factors::operator=(const Factors& second)
     }
 
 
-std::ostream& operator<<(std::ostream& out, Factors& obj)
+std::ostream& operator<<(std::ostream& out, const Factors& obj)
     {
-    out<<"y = "<<obj.y<<"\ta = "<<obj.a<<"\n";
+    out<<"y = "<<std::setw(6)<<std::left<<obj.y<<"\t\ta = "<<std::setw(5)<<std::left<<obj.a<<"\n"<<std::fixed;
 
     return out;
     }
-
-
-
-

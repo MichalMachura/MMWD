@@ -13,6 +13,8 @@
 #include<utility>
 #include<memory>
 #include <typeinfo>
+#include <sstream>
+#include <iostream>
 
 typedef bool (*checkingFunction)(std::vector<Action*>*);
 typedef std::pair<std::shared_ptr<const Action>,const checkingFunction> Pair_shared_ptr_Action_checkingFunction;
@@ -33,30 +35,42 @@ class DayActions : public Chromosome
         virtual bool updateFactors();
         void sort();
         virtual bool checkRestrictionsAndRetake();
-        double countGoalFunction();
+        static void adjustToNextRange(std::vector<Action*>* vec, TimeRange& previous, TimeRange& next);
+
 
     private:
         std::vector<Action*>* getPart(TimeRange&) const;
-        bool setPart(std::vector<Action*>*,Factors&, TimeRange&);
+        void setPart(std::vector<Action*>*,Factors&, TimeRange&);
         bool deleteRange(TimeRange&);
 
         void deleteAllActionsAndGoalFunction();
+        void addRandomAction();
+        void deleteOverlapping();
+
 
     public:
-        DayActions(GoalFunction* goalFunction_, std::vector<std::pair<std::shared_ptr<const Action>,const checkingFunction>> cl_types_checkFun, Factors start_factors_ = Factors(0,0));
-        DayActions(const DayActions& other);
+        DayActions(std::shared_ptr<GoalFunction> goalFunction_, const std::vector<std::pair<std::shared_ptr<const Action>,const checkingFunction>>& cl_types_checkFun,const Factors& start_factors_);
+        explicit DayActions(const DayActions& other);
 
-        virtual DayActions* randomDayActions() const;
+        virtual DayActions* randomDayActions() const;//v
+        TimeRange getMaxFreeTimeRange();
 
-        bool addAction(const Action*);
-        bool removeAction(const Action*);
+        bool addAction(Action*);
+        bool removeAction(Action*);
         DayActions* replacePart(const DayActions*, TimeRange&) const;
 
         DayActions& operator=(const DayActions& other);
 
-        virtual std::string toString() const;
+        Chromosome* crossingOver(const Chromosome*) const;
+        Chromosome* mutation() const;
+        double goalFunction()const;
+        Chromosome* randomChromosome() const;
+        std::string toString() const;
+
 
         virtual ~DayActions();
 };
+
+TimeRange findMaxFreeTimeRange(const std::vector<Action*>&, int, int);  //must be sorted and overlapping must be deleted
 
 #endif

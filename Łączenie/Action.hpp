@@ -10,6 +10,8 @@
 #include <vector>
 #include "TimeRange.hpp"
 #include "Factors.hpp"
+#include <sstream>
+
 using std::string;
 
 class Action {
@@ -30,6 +32,7 @@ public:
 	//---- SET FUNCTION ----
 	bool setBegin(int _begin);
 	bool setEnd(int _end);
+	void setBeginEnd(int begin, int end);
 	void setTimeRange(TimeRange range);
 	void setTimeRange(int, int);
 
@@ -44,7 +47,7 @@ public:
 
 	//virtual bool checkRestrictionAndRetake(std::vector<Action*>* collection) = 0;
 
-	virtual string toString() const = 0;
+	virtual string toString() const ;
 
 	virtual bool update(std::vector<Action*>* collection, Factors& start_factors) = 0;
 
@@ -52,7 +55,7 @@ public:
 
 	virtual Action* clone() const = 0;
 
-	virtual Action* dividingByRange(TimeRange& range) = 0;
+	virtual Action* divideByRange(TimeRange& range) = 0;
 
 	virtual ~Action()
         {}

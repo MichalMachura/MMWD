@@ -6,16 +6,14 @@ bool DayActions::addAction(Action* a)
     //pewnie czhodizlo o
     try
         {
-        bool supported type = false;
-        for(Pair_shared_ptr_Action_checkingFunction x : class_types_and_check_functions)
-            if(typeid(x.first) == typeid(a))
-                supported_type = true;
+        //bool supported_type = false;
 
-        if(!supported_type)
-            return false;
+        //for(Pair_shared_ptr_Action_checkingFunction x : class_types_and_check_functions)    //check supporting for this action
+          //  if(typeid(x.first).name() == typeid(a).name())
+            //    supported_type = true;
 
-        //int l = collection.size();
-        //bool flag_przedzialy_nie_nachodza;
+        //if(!supported_type)
+          //  return false;
 
         for(auto x : collection)
             if(a->isEqual(x) == 0)
@@ -27,6 +25,8 @@ bool DayActions::addAction(Action* a)
 
         modified = 1;
         updated_factors = 0;
+
+        updateFactors();
 
         return true;    //true z ma³ej litery
         }

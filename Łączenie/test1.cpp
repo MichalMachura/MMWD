@@ -8,82 +8,89 @@
 #include "Coffee.hpp"
 #include "TimeRange.hpp"
 #include "CoffeeAndSleepGoalFunction.hpp"
-#include "CoffeeAndSleepGoalFunction.hpp"
-
+#include<memory>
+#include "DayActions.hpp"
+#include "Chromosome.hpp"
+#include "dwiefunkcje.hpp"
 
 using namespace std;
 
 int main()
     {
     char abc;
-/*  algorytm gen. test dla klasy Ciag
+  //algorytm gen. test dla klasy Ciag
     try
         {
+        std::shared_ptr<Sleep> sleep = make_shared<Sleep>();
+        std::shared_ptr<Coffee> coffee =  make_shared<Coffee>();
+        TimeRange range;
+        Factors st_factors(0,0);
+
+        std::vector<Pair_shared_ptr_Action_checkingFunction> vec;
+        vec.push_back(Pair_shared_ptr_Action_checkingFunction(sleep,Sleep::checkRestrictionAndRetake));
+        vec.push_back(Pair_shared_ptr_Action_checkingFunction(coffee,Coffee::checkRestrictionAndRetake));
+
+        std::shared_ptr<GoalFunction> gF = make_shared<CoffeeAndSleepGoalFunction>();
+
+        DayActions ch(gF,vec,st_factors);
+
         clock_t start_time, end_time;
-        Ciag ch;
 
         //(wyswietlanie ,chrom. , roznica, liczba powtorzen wyniku, max iter.,max. populacja, max liczba wybieranych najlepszych)
-        GeneticAlgorithm genAlg = GeneticAlgorithm(cout,&ch,0,5,400,400,7);
+        GeneticAlgorithm genAlg = GeneticAlgorithm(cout,&ch,1.0,15,100,300,15);
 
         start_time = clock();
-        Ciag* ans = (Ciag*) genAlg.startAlgorithm(true);
+        Chromosome* ans = genAlg.startAlgorithm(true);
         end_time = clock();
-        cout<<genAlg<<endl<<endl<<"Execution time : "<<end_time-start_time<<endl;
+        cout<<genAlg<<endl<<endl;
+        genAlg.status(cout);
+        std::cout<<ans->toString();
 
-        /********************
-        start_time = clock();
-        ans = (Ciag*) genAlg.restart(&ch,0,10,1000,2000,3);
-        end_time = clock();
-        cout<<"RESTART : \n\n"<<genAlg<<endl<<endl<<"Execution time : "<<end_time-start_time<<endl;
-        *
-        }
-    catch(string s)
-        {
-        cout<<"main\n"<<s;
-        }*/
+        cout<<"Execution time : "<<end_time-start_time<<endl;
 
-    Sleep sleep;
-    Coffee coffee;
+
+        //start_time = clock();
+        //ans = genAlg.restart(&ch,0,10,1000,2000,3);
+        //end_time = clock();
+        //cout<<"RESTART : \n\n"<<genAlg<<endl<<endl<<"Execution time : "<<end_time-start_time<<endl;
+
+  /*  try{
+    std::shared_ptr<Sleep> sleep = make_shared<Sleep>();
+    std::shared_ptr<Coffee> coffee =  make_shared<Coffee>();
     TimeRange range;
     Factors st_factors(0,0);
-    std::vector<Action*> vec, vec1;
 
-    for(int i = 1; i < 7; ++i)
+    std::vector<Pair_shared_ptr_Action_checkingFunction> vec;
+    vec.push_back(Pair_shared_ptr_Action_checkingFunction(sleep,Sleep::checkRestrictionAndRetake));
+    vec.push_back(Pair_shared_ptr_Action_checkingFunction(coffee,Coffee::checkRestrictionAndRetake));
+
+    std::shared_ptr<GoalFunction> gF = make_shared<CoffeeAndSleepGoalFunction>();
+
+    DayActions dA(gF,vec,st_factors);
+    //gF = nullptr;
+    //vec.clear();
+    //sleep = nullptr;
+    //coffee = nullptr;
+    //dA.addAction(new Sleep(60,23*60));
+
+    DayActions* rDA1 = dA.randomDayActions();
+    DayActions* rDA2 = dA.randomDayActions();
+
+    cout<<"\nFirst DayAction:\n\n"<<rDA1->toString()<<"\n_____________________________________________________________\n";
+    cout<<"\nSecond DayAction:\n\n"<<rDA2->toString()<<"\n_____________________________________________________________\n";
+
+    for(int i = 0; i < 1; ++i)
         {
-        range = TimeRange::randomTimeRange((i-1)*24/12*60, i*24*60/12);
-        vec.push_back(coffee.randomAction(range));
-        i++;
-        range = TimeRange::randomTimeRange((i-1)*24/12*60, i*24*60/12);
-        vec.push_back(sleep.randomAction(range));
+        cout<<"Mutated DayAction nr:"<<i+1<<"\n";
+        Chromosome* rDA = rDA1->mutation();
+        cout<<rDA->toString()<<"\n_____________________________________________________________\n";
+        delete rDA;
+        cout<<"Crossed DayAction\n";
+        rDA = rDA1->crossingOver(rDA2);
+        cout<<rDA->toString()<<"\n_____________________________________________________________\n";
+        delete rDA;
         }
-
-    cout<<"vec : \n";
-    for(Action* x : vec)
-        {
-        cout<<x->toString();
-        }
-
-    Coffee::checkRestrictionAndRetake(&vec);
-
-
-    cout<<"\nvec  after check: \n";
-    for(Action* x : vec)
-        {
-        Factors temp = x->getFactorsAfter();
-        cout<<x->toString()<<temp;
-        x->update(&vec,st_factors);
-        }
-
-
-    cout<<"\nvec  after update: \n"<<"start_factors :\n"<<st_factors;
-    for(Action* x : vec)
-        {
-        Factors temp = x->getFactorsAfter();
-        cout<<x->toString()<<temp;
-        }
-
-    CoffeeAndSleepGoalFunction CaSGF(1,1);
-    cout<<"goal function val: \n"<<CaSGF.goalFunction(&vec,st_factors)<<"%";
+*/
 
 
 /* dzielenie
@@ -109,14 +116,27 @@ int main()
 
         cout<<vec1[i]->toString()<<endl;
         }*/
-    for(auto x : vec)
-        delete x;
 
-    for(auto x : vec1)
-        delete x;
 
-    vec.clear();
-    vec1.clear();
+    //delete rDA1;
+    //delete rDA2;
+    }
+    catch(std::string s)
+        {
+        cout<<s<<endl;
+        }
+    catch(std::exception& e)
+        {
+        cout<<e.what()<<endl;
+        }
+    catch(char* s)
+        {
+        cout<<s<<endl;
+        }
+    catch(...)
+        {
+        cout<<"nieznane"<<endl;
+        }
 
     cin>>abc;
 

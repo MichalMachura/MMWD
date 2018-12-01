@@ -14,12 +14,13 @@ class CoffeeAndSleepGoalFunction : public GoalFunction
 
         void countMaxPossible() const;
         static double countLocalIntegral(Factors& previous_end_factors, int previous_end_time, int current_start_time) ;
+        static Factors factorsAt(int time,const Factors& previous_factors,int previous_end);
 
     public:
-        CoffeeAndSleepGoalFunction(double multi_integral, double multi_coffee) : multiplier_integral(multi_integral),multiplier_coffee(multi_coffee){void countMaxPossible();}
+        CoffeeAndSleepGoalFunction(double multi_integral = 1.0, double multi_coffee = 1.0) : multiplier_integral(multi_integral),multiplier_coffee(multi_coffee){void countMaxPossible();}
 
-        double goalFunction(std::vector<Action*>* collection, Factors& start_factors) const;
-        Factors getFactorsAt(int time, Factors& start_factors_, std::vector<Action*>* collection) const;
+        double goalFunction(const std::vector<Action*>* collection, const Factors& start_factors) const;
+        Factors getFactorsAt(int time, const Factors& start_factors_, const std::vector<Action*>* collection) const;
     };
 
 #endif // COFFEEANDSLEEPGOALFUNCTION_HPP

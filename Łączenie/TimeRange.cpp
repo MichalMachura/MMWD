@@ -99,7 +99,12 @@ std::string minToString (int mins){
 	std::array<int,2> minAndHours= minToHours(mins);
 	int h = minAndHours[1];
 	int m = minAndHours[0];
-	std::string text = std::to_string(h)+ std::string("h ")+std::to_string(m)+std::string("min");
-	return text;
+	std::stringstream text;
+	text.width(2);
+	//text.fill(' ');
+	text<<h<<"h ";
+    text.width(2);
+	text<<m<<"min";
+	return text.str();
 };
 

@@ -9,10 +9,10 @@
 #define COFFEE_HPP_
 
 #include "Action.hpp"
-#include <algorithm>
-#include <iostream>
+//#include <algorithm>
 #include <cmath>
 #include <vector>
+#include<iomanip>
 
 class Coffee : public Action{
 private:
@@ -80,7 +80,7 @@ public:
 
 	// --- dividingByRange(...) ---
 	// 	Dla Coffee nic nie robi
-	Action* dividingByRange(TimeRange &range);
+	Action* divideByRange(TimeRange &range);
 
 	~Coffee(){}
 

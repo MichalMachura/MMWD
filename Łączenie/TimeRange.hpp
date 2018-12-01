@@ -20,6 +20,7 @@
 
 #include "generateRandom.hpp" // zawiera funkcje generateRandom(int, int)
 #include <ostream>
+#include <sstream>
 
 /* --------- STALE ----------*/
 const int MIN_IN_DAY=24*60;		//ile jest min w dobie
@@ -63,9 +64,12 @@ public:
 	//  this->begin - second.end > 0 if this is later than other;
 	//  0 if are some complications or ranges are equal
     int isEqual(const TimeRange&) const;
+    bool contain(const TimeRange& range) const;
+
 
     TimeRange& operator=(const TimeRange&);
     friend std::ostream& operator<<(std::ostream& out, const TimeRange& range);
+    void operator()(int begin_, int end_);
 };
 
 

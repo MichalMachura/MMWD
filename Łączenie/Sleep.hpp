@@ -7,8 +7,6 @@
 
 #ifndef SLEEP_HPP_
 #define SLEEP_HPP_
-//#include<string>
-//#include<vector>
 #include "Action.hpp"
 
 
@@ -63,7 +61,7 @@ public:
 	//		- jeden to this ze zmienionym czasem trwania,
 	//		- a drugi, ten pozniejszy jest tworzony przez new i zwracany przez funkcje
 	//	jak range nie zawiera sie w Sleep zwraca: nullptr
-	Action* dividingByRange(TimeRange& range);
+	Action* divideByRange(TimeRange& range);
 
 	~Sleep(){}
 };

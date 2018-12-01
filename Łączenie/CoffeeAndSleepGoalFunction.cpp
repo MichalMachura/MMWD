@@ -1,10 +1,11 @@
 #include "CoffeeAndSleepGoalFunction.hpp"
 
-Factors CoffeeAndSleepGoalFunction::getFactorsAt(int time, Factors& start_factors, std::vector<Action*>* collection_) const
+Factors CoffeeAndSleepGoalFunction::getFactorsAt(int time, const Factors& start_factors, const std::vector<Action*>* collection_) const
     {
     if(time == 0)
         return start_factors;
 
+    Factors ans;
     Factors previous_factors = start_factors;
     int previous_end = 0;
 
@@ -12,19 +13,22 @@ Factors CoffeeAndSleepGoalFunction::getFactorsAt(int time, Factors& start_factor
         {
         Action* x = (*collection_)[i];
 
-        if(x->getEnd() > time)
+        if(x->getEnd() >= time)
             {
-            if(x->getBegin() <= time) // during of action x
+            if(time == x->getEnd())
+                {
+                return x->getFactorsAfter();
+                }
+            else if(x->getBegin() <= time) // during of action x
                 {
                 if(dynamic_cast<Sleep*>(x) != nullptr)  //if i's Sleep
                     {
-                    Factors ans(0,0);
+                    ans = Factors(0,0);
 
                     return ans;
                     }
                 else if(dynamic_cast<Coffee*>(x) != nullptr)    // if it's Coffee
                     {
-                    Factors ans;
                     ans = x->getFactorsAfter();
 
                     return ans;
@@ -32,29 +36,27 @@ Factors CoffeeAndSleepGoalFunction::getFactorsAt(int time, Factors& start_factor
                 }
             else    //if x->getBegin() > time and x->getEnd() > time // before action x, but after previous
                 {
-                int time_interval = time - previous_end;
+                ans = factorsAt(time,previous_factors,previous_end);
 
-                int y_at_time = previous_factors.getA()*time_interval + previous_factors.getY();
-                int a = previous_factors.getA();
-
-                if(y_at_time < 0 && previous_factors.getA() != 0)
-                    {
-                    y_at_time = 0;
-                    a = 0;
-                    }
-
-                Factors ans(y_at_time, a);
                 return ans;
                 }
             }
+
         previous_factors = x->getFactorsAfter();
         previous_end = x->getEnd();
         }
 
-    int time_interval = time - previous_end;
+    ans = factorsAt(time,previous_factors,previous_end);
 
-    int y_at_time = previous_factors.getA()*time_interval + previous_factors.getY();
-    int a = previous_factors.getA();
+    return ans;
+    }
+
+Factors CoffeeAndSleepGoalFunction::factorsAt(int time,const Factors& previous_factors,int previous_end)
+    {
+     int time_interval = time - previous_end;
+
+    double y_at_time = previous_factors.getA()*time_interval + previous_factors.getY();
+    double a = previous_factors.getA();
 
     if(y_at_time < 0 && previous_factors.getA() != 0)
         {
@@ -62,9 +64,7 @@ Factors CoffeeAndSleepGoalFunction::getFactorsAt(int time, Factors& start_factor
         a = 0;
         }
 
-    Factors ans(y_at_time, a);
-
-    return ans;
+    return Factors(y_at_time, a);
     }
 
 

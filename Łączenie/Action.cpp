@@ -38,6 +38,10 @@ void Action::setTimeRange(int begin, int end)
     begin_end = TimeRange(begin,end);
 	}
 
+void Action::setBeginEnd(int begin, int end)
+    {
+    begin_end(begin,end);
+    }
 
 // --- ISEQUAL FUNCTION:
 
@@ -50,3 +54,11 @@ int Action::isEqual(const Action* otherAction) const{
 	else
 		return 0;*/
 };
+
+std::string Action::toString() const
+    {
+	std::stringstream text;
+    text<<begin_end<<"\t"<<factors_after;
+
+	return text.str();
+    }

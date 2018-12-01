@@ -84,6 +84,7 @@ bool Coffee::checkRestrictionAndRetake(std::vector<Action*>*collection){
 				{
                 delete (*collection)[i];
                 collection->erase(collection->begin()+i);
+                --i;
                 continue;
 				}
             /*
@@ -132,11 +133,10 @@ double Coffee::modificationAlpha(int coffeePortion_current, int coffeePortion_su
 };
 
 string Coffee::toString() const{
-	string text = "COFFEE"+string("\t") + "START: "	+ string(minToString(begin_end.getBegin()))
-			+ string("\t")+string("STOP: ")
-			+ minToString(begin_end.getEnd()) + string("\t") + "Portion: "
-			+ std::to_string(coffee_quantity) + "ml \n";
-	return text;
+	std::stringstream text;
+    text<<"COFFEE:\t"<<Action::toString() <<"\tPortion:   "<<std::setw(4)<<coffee_quantity<<"ml\n";
+
+	return text.str();
 };
 
 bool Coffee::update(std::vector<Action*>* collection, Factors& start_factors){
@@ -148,8 +148,8 @@ bool Coffee::update(std::vector<Action*>* collection, Factors& start_factors){
 	for (Action* x : *collection){
 		Coffee* item = dynamic_cast<Coffee*>(x);
 			if(item == this){
-                drinked_coffee += item->getCoffeeQuantity();
 				item->factorsAfter(previous,drinked_coffee);
+                drinked_coffee += item->getCoffeeQuantity();
 
 				return true;
 			}
@@ -177,7 +177,7 @@ Action* Coffee::clone() const{
 	return ptrCoffee;
 }
 
-Action* Coffee::dividingByRange(TimeRange &range){
+Action* Coffee::divideByRange(TimeRange &range){
 	return nullptr;
 }
 
