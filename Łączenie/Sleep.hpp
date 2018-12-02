@@ -8,6 +8,7 @@
 #ifndef SLEEP_HPP_
 #define SLEEP_HPP_
 #include "Action.hpp"
+#include "DayActions.hpp"
 
 
 class Sleep :public Action{
@@ -21,6 +22,9 @@ private:
 	 * 	w zale¿noœci od snu w minutach (m).
 	 */
 	static double alph(int m);
+
+	static int sumSleeps(std::vector<Action*>* collection);	//sumuje ilosc snu w wektorze
+
 
 public:
 
@@ -38,7 +42,10 @@ public:
 	// 	- false, gdy jest za mało snu w wektorze
 	//	- true w pozostałych przypadkach
 	// funkcja również łączy dwa przylegające sny w jeden.
-	static bool checkRestrictionAndRetake(std::vector<Action*>* collection);
+	static void checkRestrictionAndRetake(std::vector<Action*>* collection, DayActions* dayActions);
+    static void deleteToShortSleeps(std::vector<Action*>* collection, DayActions* dayActions);
+    static void completionSleepAtDayAction(std::vector<Action*>* collection, DayActions* dayActions);
+    static void connectNearest(std::vector<Action*>* collection, DayActions* dayActions);
 
 	// --- toString()
 	// 	do wyswietlania Sleep
@@ -46,7 +53,7 @@ public:
 
 	// --- update()
 	// 	Przeszukuje wektor i uaktualnia we wszystkich Sleep składową factors_after
-	bool update(std::vector<Action*>* collection, Factors& start_factors);
+	void update(std::vector<Action*>* collection, Factors& start_factors);
 
 	// --- randomAction ---
 	// Zwraca wskaznik (stworzony przez new) na losowa Sleep w podanym TimeRange.

@@ -65,7 +65,7 @@ void Coffee::setCoffeeQuantity(int _quantities)
 		coffee_quantity = MIN_PORTION;
     }
 
-bool Coffee::checkRestrictionAndRetake(std::vector<Action*>*collection){
+void Coffee::checkRestrictionAndRetake(std::vector<Action*>*collection, DayActions* dayAction){
 	int coffeeSum = 0;
 	for (unsigned int i = 0; i < collection->size(); i++){
 		Coffee* item = dynamic_cast<Coffee*>((*collection)[i]);
@@ -75,7 +75,7 @@ bool Coffee::checkRestrictionAndRetake(std::vector<Action*>*collection){
 
 			if (coffeeToAdd<=rest_for_coffee_portion)   //gdy ta porca jest mniejsza od pozostałego limitu kawy
 				coffeeSum += coffeeToAdd;
-            else if(rest_for_coffee_portion > 0)    //porca jest wieksza od limitu  ale limit jeszcze jest do wykozystania
+            else if(rest_for_coffee_portion > 0 && rest_for_coffee_portion > MIN_PORTION)    //porca jest wieksza od limitu  ale limit jeszcze jest do wykozystania
                 {
                 item->setCoffeeQuantity(rest_for_coffee_portion);   //w tej czynnosci ustawiamy wartoc spozytej kawy na reszte limitu
                 coffeeSum = MAX_TOTAL_PER_DAY;  //sume kawy ustawiamy na max
@@ -96,8 +96,6 @@ bool Coffee::checkRestrictionAndRetake(std::vector<Action*>*collection){
 				}*///saturacja w factorsAfter()
 			}
 		}
-
-	return true;
 };
 
 void Coffee::factorsAfter(Action* previousAction, int current_total_coffee_quantity){
@@ -139,7 +137,7 @@ string Coffee::toString() const{
 	return text.str();
 };
 
-bool Coffee::update(std::vector<Action*>* collection, Factors& start_factors){
+void Coffee::update(std::vector<Action*>* collection, Factors& start_factors){
 
     int drinked_coffee = 0;
     Coffee fictionStarter(0,0,start_factors);
@@ -151,7 +149,7 @@ bool Coffee::update(std::vector<Action*>* collection, Factors& start_factors){
 				item->factorsAfter(previous,drinked_coffee);
                 drinked_coffee += item->getCoffeeQuantity();
 
-				return true;
+				return ;
 			}
 			else if(item != nullptr)
                 {
@@ -161,7 +159,6 @@ bool Coffee::update(std::vector<Action*>* collection, Factors& start_factors){
 
         previous = x;
 	}
-	return false;
 }
 
 

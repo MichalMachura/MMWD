@@ -58,7 +58,7 @@ public:
 
 	// ---  checkRestrictionAndRetake(...)
 	//	Sprawdza czy nie przekroczono ilości kawy w wektorze
-	static bool checkRestrictionAndRetake(std::vector<Action*>*collection);
+	static void checkRestrictionAndRetake(std::vector<Action*>*collection, DayActions* dayActions);
 
 	// --- toString() ---
 	// do wyswietlania czasu czasu i ilosci snu
@@ -66,7 +66,7 @@ public:
 
 	// --- update()
 	// 	Przeszukuje wektor i oblicza we wszystkich Coffee składową factors_after
-	bool update(std::vector<Action*>* collection, Factors& start_factors);
+	void update(std::vector<Action*>* collection, Factors& start_factors);
 
 	// --- randomAction(...) ---
 	//	Zwraca wskaznik (stworzony przez new) na losowa Coffe w początku TimeRange

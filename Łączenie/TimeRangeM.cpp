@@ -67,4 +67,7 @@ bool TimeRange::contain(const TimeRange& range) const
     return false;
     }
 
-
+TimeRange TimeRange::randomTimeRange(const TimeRange& range, int length_)
+    {
+    return randomTimeRange(range.begin,range.end, length_);
+    }

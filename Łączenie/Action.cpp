@@ -62,3 +62,14 @@ std::string Action::toString() const
 
 	return text.str();
     }
+
+std::ostream& operator<<(std::ostream& out, const Action& obj)
+    {
+    out<<obj.toString();
+
+    return out;
+    }
+
+
+
+

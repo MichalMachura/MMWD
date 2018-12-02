@@ -11,6 +11,7 @@
 #include "TimeRange.hpp"
 #include "Factors.hpp"
 #include <sstream>
+#include "DayActions.hpp"
 
 using std::string;
 
@@ -49,13 +50,15 @@ public:
 
 	virtual string toString() const ;
 
-	virtual bool update(std::vector<Action*>* collection, Factors& start_factors) = 0;
+	virtual void update(std::vector<Action*>* collection, Factors& start_factors) = 0;
 
 	virtual Action* randomAction(TimeRange range)const  = 0;
 
 	virtual Action* clone() const = 0;
 
 	virtual Action* divideByRange(TimeRange& range) = 0;
+
+	friend std::ostream& operator<<(std::ostream& out, const Action& obj);
 
 	virtual ~Action()
         {}

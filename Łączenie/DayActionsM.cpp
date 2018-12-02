@@ -19,7 +19,7 @@ void DayActions::sort() //setting and removing flags
                 Action* temporary = collection[i];
                 collection[i] = collection[i+1];
                 collection[i+1] = temporary;
-                flag = true;    //ustwienie flagi gdy nast¹pi zmiana
+                flag = true;    //ustwienie flagi gdy nastÂ¹pi zmiana
                 }
             }
 
@@ -29,7 +29,7 @@ void DayActions::sort() //setting and removing flags
         modified = true;        //setting and removing flags
         updated_factors = false;
 
-        flag = false;   //reset flagi, gdy jest ustawiona dla nastêpnej pêtli
+        flag = false;   //reset flagi, gdy jest ustawiona dla nastÃªpnej pÃªtli
         }
 
     deleteOverlapping();
@@ -84,8 +84,8 @@ void DayActions::deleteOverlapping()
 
 DayActions* DayActions::replacePart(const DayActions* other, TimeRange& range) const
     {
-    if(this->class_types_and_check_functions != other->class_types_and_check_functions)     //class types must be the same
-        throw std::string("\nObjects are contain different Action class types and checkFunctions objects. Replace is impossible!\n");
+    if(this->class_types != other->class_types)     //class types must be the same
+        throw std::string("\nObjects are contain different Action class types objects. Replace is impossible!\n");
 
     if(range.getBegin() == range.getEnd())  //it's pointed range
         return new DayActions(*this);
@@ -118,13 +118,9 @@ DayActions* DayActions::replacePart(const DayActions* other, TimeRange& range) c
         }
 
     ans->setPart(part, part_start_factors, range);
+
     ans->sort();
-    ans->deleteOverlapping();
-    if(!(ans->checkRestrictionsAndRetake()) || !(ans->updateFactors()))        //if is not correct or cannot be updated
-        {
-        *ans = *this;
-        return ans;
-        }
+    ans->updateFactors();
 
     return ans;
     }
@@ -199,8 +195,7 @@ Chromosome* DayActions::mutation() const
 
     ans->sort();
 
-    if((!ans->checkRestrictionsAndRetake()) || !(ans->updateFactors()) )   //if it cannot be corrected or be updated
-        *ans = *this;
+    ans->updateFactors();
 
 
 //std::cout<<"Mutation:\nTR1: "<<t1<<"\nTR2: "<<t2<<"\nis: "<<"\n";
@@ -376,37 +371,29 @@ Chromosome* DayActions::randomChromosome() const
     return randomDayActions();
     }
 
-bool DayActions::updateFactors()   //setting flag updated_factors
+void DayActions::updateFactors()   //setting flag updated_factors
     {
     if(modified)        //if some modifications
         checkRestrictionsAndRetake();
 
-    bool ans = true;        // answer of upgrading modifiers
-
     for(Action* x : collection)
-        if(!(x->update(&collection, start_factors))) // if any returned false
-            ans = false;    // answer is false
+        x->update(&collection, start_factors);
 
     updated_factors = true; //setting flag
 
     goal_function_value = goalFunction();
-
-    return ans;
     }
 
-bool DayActions::checkRestrictionsAndRetake()   //removing modified and updated_factors
+void DayActions::checkRestrictionsAndRetake()   //removing modified and updated_factors
     {
-    bool ans = true;
-
     sort();
 
-    for(Pair_shared_ptr_Action_checkingFunction x : class_types_and_check_functions)
-        if(!(x.second(&collection)))
-            ans = false;
+    for(checkingFunction x : check_functions)
+        if(x != nullptr)
+            x(&collection,this);
 
     modified = false;   //setting flag
     updated_factors = false;
-    return ans;
     }
 
 bool DayActions::removeAction(Action* action)   //setting flag modified and removing updated_factors
@@ -439,7 +426,9 @@ void DayActions::deleteAllActionsAndGoalFunction()
         delete x;
     collection.clear();
 
-    class_types_and_check_functions.clear();
+    class_types.clear();
+
+    check_functions.clear();
 
     goal_function = nullptr;
 
@@ -452,21 +441,23 @@ DayActions::~DayActions()
     deleteAllActionsAndGoalFunction();
     }
 
-DayActions::DayActions(std::shared_ptr<GoalFunction> goalFunction_, const std::vector<Pair_shared_ptr_Action_checkingFunction>& cl_types_checkFun, const Factors& start_factors_) : start_factors(start_factors_)
+DayActions::DayActions(std::shared_ptr<GoalFunction> goalFunction_, const std::vector<shared_ptr_Action>& cl_types, std::vector<checkingFunction> checkFun, const Factors& start_factors_) : start_factors(start_factors_)
     {
-    if(cl_types_checkFun.empty())
-        throw std::string("\ncl_types_checkFun is empty\n");
+    if(cl_types.empty())
+        throw std::string("\ncl_types is empty\n");
 
     if(!goalFunction_)
         throw std::string("\ngoalFunction is nullptr\n");
 
-    for(Pair_shared_ptr_Action_checkingFunction x : cl_types_checkFun)   //checking input vector for nullptr elements
-        if(!(x.first) || x.second == nullptr) //if object or fun is nullptr
-            throw std::string("\ncl_types_checkFun contain nullptr Action* or checkingFunction\n");
+    for(shared_ptr_Action x : cl_types)   //checking input vector for nullptr elements
+        if(!x) //if object or fun is nullptr
+            throw std::string("\ncl_types contain nullptr Action*\n");
 
     //class_types_and_check_functions = cl_types_checkFun;
-    for(Pair_shared_ptr_Action_checkingFunction x : cl_types_checkFun)
-        class_types_and_check_functions.push_back(Pair_shared_ptr_Action_checkingFunction(x.first,x.second));
+    for(shared_ptr_Action x : cl_types)
+        class_types.push_back(x);
+
+    check_functions = checkFun;
 
     goal_function = goalFunction_;
 
@@ -479,8 +470,10 @@ DayActions& DayActions::operator=(const DayActions& other)
     {
     deleteAllActionsAndGoalFunction(); //clearing the vector for new actions
 
-    for(Pair_shared_ptr_Action_checkingFunction x : other.class_types_and_check_functions)
-        class_types_and_check_functions.push_back(Pair_shared_ptr_Action_checkingFunction(x.first,x.second));
+    for(shared_ptr_Action x : other.class_types)
+        class_types.push_back(x);
+
+    check_functions = other.check_functions;
 
     modified = other.modified;
     updated_factors = other.updated_factors;
@@ -501,7 +494,7 @@ DayActions::DayActions(const DayActions& other)
 DayActions* DayActions::randomDayActions() const
     {
     Factors random_start(generateRandom(0,100),generateRandom(-10000,0)/1000.0); //random start_factors
-    DayActions* answer = new DayActions(this->goal_function, this->class_types_and_check_functions,random_start);    //returned object
+    DayActions* answer = new DayActions(this->goal_function, this->class_types, this->check_functions,random_start);    //returned object
 
     if(answer == nullptr)
         throw "Random DayAction is equal nullptr.\n";
@@ -552,9 +545,7 @@ TimeRange findMaxFreeTimeRange(const std::vector<Action*>& collection, int start
 TimeRange DayActions::getMaxFreeTimeRange()
     {
     if(modified)
-        {
         sort();             //sorting and deleting overlapping, because it's outside interface
-        }
 
     return findMaxFreeTimeRange(collection, start_,end_);
     }
@@ -563,9 +554,9 @@ void DayActions::addRandomAction()
     {
     TimeRange range = getMaxFreeTimeRange();    //the largest free range
     TimeRange random_part_of_range = TimeRange::randomTimeRange(range.getBegin(),range.getEnd());   // randomizing a part from the largest range
-    int random_type_num = generateRandom(0,class_types_and_check_functions.size()-1); //choosing type of action
+    int random_type_num = generateRandom(0,class_types.size()-1); //choosing type of action
 
-    Action* addedAction = class_types_and_check_functions[random_type_num].first->randomAction(random_part_of_range); //creating random action
+    Action* addedAction = (class_types[random_type_num])->randomAction(random_part_of_range); //creating random action
 
     modified = true;
     updated_factors = false;

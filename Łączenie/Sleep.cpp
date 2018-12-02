@@ -30,14 +30,22 @@ double Sleep::alph(int m){
 };
 
 
-bool Sleep::checkRestrictionAndRetake(std::vector<Action*>* collection){
+void Sleep::checkRestrictionAndRetake(std::vector<Action*>* collection, DayActions* dayActions){
 	// Zakladam, ze wszystko jest chronologicznie i kawa nie naklada się na sen.
+	connectNearest(collection,dayActions);
+
+	deleteToShortSleeps(collection,dayActions);
+
+    completionSleepAtDayAction(collection,dayActions);
+};
+
+void Sleep::connectNearest(std::vector<Action*>* collection, DayActions* dayActions)
+    {
 	int counter = 0;
-	int sumSleep = 0;
+
 	for (unsigned int i = 0; i < collection->size(); i++){
 		Sleep* item = dynamic_cast<Sleep*>((*collection)[i]);
 		if(item){
-			sumSleep += item->begin_end.length();
 			counter++;
 			if (counter==2){
 				TimeRange firstTR = (*collection)[i-1]->getTimeRange();
@@ -65,25 +73,74 @@ bool Sleep::checkRestrictionAndRetake(std::vector<Action*>* collection){
 		}
 		else
 			counter = 0;
-	}
+    }
+    }
 
-	for(int i = 0; i < collection->size(); ++i)
+void Sleep::deleteToShortSleeps(std::vector<Action*>* collection, DayActions* dayActions)
+    {
+    for(int i = 0; i < collection->size(); ++i)
         {
         Sleep* sl = dynamic_cast<Sleep*>((*collection)[i]);
         if(sl != nullptr && sl->begin_end.length() < MIN_SLEEP)
             {
-            sumSleep-=sl->begin_end.length();
             delete sl;
             collection->erase(collection->begin() + i);
             --i;
             }
         }
 
-	if (sumSleep < MIN_DAY_SLEEP)
-		return true;
-	else
-		return true;
-};
+    }
+
+void Sleep::completionSleepAtDayAction(std::vector<Action*>* collection, DayActions* dayActions)
+    {
+    bool was_added = false;
+    int rest_sleep;
+    int sumSleep = sumSleeps(collection);
+
+    rest_sleep = MIN_DAY_SLEEP - sumSleep;
+
+    while(rest_sleep > 0)
+        {
+        if(rest_sleep < MIN_SLEEP)
+            rest_sleep = MIN_SLEEP;
+
+        TimeRange range = dayActions->getMaxFreeTimeRange();
+
+        if(range.length() <= MIN_SLEEP) //when is no more any free ranges in action
+            break;
+
+        if(range.length() > rest_sleep)     //if range is larger than is needed
+            range = TimeRange::randomTimeRange(range,rest_sleep);
+
+        Sleep* add = new Sleep(range);  //creating sleep object
+
+        rest_sleep -=range.length();    //divide from rest time
+
+        dayActions->addAction(add);     //adding to dayActions as a new action
+
+        was_added = true;
+        }
+
+    if(was_added)
+        connectNearest(collection,dayActions);
+    }
+
+int Sleep::sumSleeps(std::vector<Action*>* collection)
+    {
+    int sumSleep = 0;
+
+    for(Action* x : *collection)
+        {
+        Sleep* xSleep = dynamic_cast<Sleep*>(x);
+
+        if(xSleep != nullptr)
+            {
+            sumSleep += xSleep->begin_end.length();
+            }
+        }
+
+    return sumSleep;
+    }
 
 
 Factors Sleep::factorsAfter(){
@@ -104,7 +161,7 @@ string Sleep::toString() const{
 };
 
 
-bool Sleep::update(std::vector<Action*>* collection, Factors& start_factors){
+void Sleep::update(std::vector<Action*>* collection, Factors& start_factors){
 
 	for (unsigned int i = 0; i < collection->size(); i++){
 		Sleep* item = dynamic_cast<Sleep*>((*collection)[i]);
@@ -112,7 +169,6 @@ bool Sleep::update(std::vector<Action*>* collection, Factors& start_factors){
 			item->factorsAfter();
 		}
 	}
-	return true;
 }
 
 Action* Sleep::randomAction(TimeRange range) const{

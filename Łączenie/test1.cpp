@@ -26,13 +26,17 @@ int main()
         TimeRange range;
         Factors st_factors(0,0);
 
-        std::vector<Pair_shared_ptr_Action_checkingFunction> vec;
-        vec.push_back(Pair_shared_ptr_Action_checkingFunction(sleep,Sleep::checkRestrictionAndRetake));
-        vec.push_back(Pair_shared_ptr_Action_checkingFunction(coffee,Coffee::checkRestrictionAndRetake));
+        std::vector<shared_ptr_Action> vec;
+        vec.push_back(shared_ptr_Action(sleep));
+        vec.push_back(shared_ptr_Action(coffee));
+
+        std::vector<checkingFunction> fun;
+        fun.push_back(Sleep::checkRestrictionAndRetake);
+        fun.push_back(Coffee::checkRestrictionAndRetake);
 
         std::shared_ptr<GoalFunction> gF = make_shared<CoffeeAndSleepGoalFunction>();
 
-        DayActions ch(gF,vec,st_factors);
+        DayActions ch(gF,vec,fun,st_factors);
 
         clock_t start_time, end_time;
 
@@ -44,7 +48,7 @@ int main()
         end_time = clock();
         cout<<genAlg<<endl<<endl;
         genAlg.status(cout);
-        std::cout<<ans->toString();
+        std::cout<<endl<<(*ans);
 
         cout<<"Execution time : "<<end_time-start_time<<endl;
 

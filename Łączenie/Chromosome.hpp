@@ -1,6 +1,7 @@
 #ifndef CHROMOSOME_HPP
 #define CHROMOSOME_HPP
 #include<string>
+#include<ostream>
 
 class Chromosome
     {
@@ -10,6 +11,9 @@ class Chromosome
         virtual double goalFunction()const = 0;
         virtual Chromosome* randomChromosome() const = 0;
         virtual std::string toString() const = 0;
+
+        friend std::ostream& operator<<(std::ostream& out, const Chromosome& ch);
+
         virtual ~Chromosome(){}
     };
 

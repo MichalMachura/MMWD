@@ -12,7 +12,8 @@ g++ -c -std=c++11 addAction.cpp -o addAction.o
 g++ -c -std=c++11 DayActionsM.cpp -o DayActionsM.o
 g++ -c -std=c++11 dwiefunkcje.cpp -o dwiefunkcje.o
 g++ -c -std=c++11 Ciag.cpp -o Ciag.o
+g++ -c -std=c++11 Chromosome.cpp -o Chromosome.o
 g++ -c -std=c++11 GeneticAlgorithm.cpp -o GeneticAlgorithm.o
 g++ -c -std=c++11 test1.cpp -o test1.o
-g++ generateRandom.o Factors.o TimeRange.o TimeRangeM.o Action.o Sleep.o Coffee.o CoffeeAndSleepGoalFunction.o goalFunction.o addAction.o DayActionsM.o dwiefunkcje.o Ciag.o  GeneticAlgorithm.o test1.o -o algorytm_genetyczny_1.exe
+g++ generateRandom.o Factors.o TimeRange.o TimeRangeM.o Action.o Sleep.o Coffee.o CoffeeAndSleepGoalFunction.o goalFunction.o addAction.o DayActionsM.o dwiefunkcje.o Ciag.o Chromosome.o GeneticAlgorithm.o test1.o -o algorytm_genetyczny_1.exe
 algorytm_genetyczny_1.exe

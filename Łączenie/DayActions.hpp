@@ -1,6 +1,10 @@
 #ifndef DAYACTIONS_HPP
 #define DAYACTIONS_HPP
 
+class Action;
+class DayActions;
+class GoalFunction;
+
 #include "Chromosome.hpp"
 #include "Action.hpp"
 #include "TimeRange.hpp"
@@ -16,8 +20,9 @@
 #include <sstream>
 #include <iostream>
 
-typedef bool (*checkingFunction)(std::vector<Action*>*);
-typedef std::pair<std::shared_ptr<const Action>,const checkingFunction> Pair_shared_ptr_Action_checkingFunction;
+typedef void (*checkingFunction)(std::vector<Action*>*,DayActions*);
+typedef std::shared_ptr<const Action> shared_ptr_Action;
+
 
 class DayActions : public Chromosome
     {
@@ -29,12 +34,12 @@ class DayActions : public Chromosome
         Factors start_factors;
         std::vector<Action*> collection;
         std::shared_ptr<GoalFunction> goal_function;
-        std::vector<Pair_shared_ptr_Action_checkingFunction> class_types_and_check_functions;
+        std::vector<shared_ptr_Action> class_types;
+        std::vector<checkingFunction> check_functions;
         double goal_function_value;
 
-        virtual bool updateFactors();
+        virtual void updateFactors();
         void sort();
-        virtual bool checkRestrictionsAndRetake();
         static void adjustToNextRange(std::vector<Action*>* vec, TimeRange& previous, TimeRange& next);
 
 
@@ -43,13 +48,14 @@ class DayActions : public Chromosome
         void setPart(std::vector<Action*>*,Factors&, TimeRange&);
         bool deleteRange(TimeRange&);
 
+        void checkRestrictionsAndRetake();
         void deleteAllActionsAndGoalFunction();
         void addRandomAction();
         void deleteOverlapping();
 
 
     public:
-        DayActions(std::shared_ptr<GoalFunction> goalFunction_, const std::vector<std::pair<std::shared_ptr<const Action>,const checkingFunction>>& cl_types_checkFun,const Factors& start_factors_);
+        DayActions(std::shared_ptr<GoalFunction> goalFunction_, const std::vector<shared_ptr_Action>& cl_types, std::vector<checkingFunction> checkFun, const Factors& start_factors_);
         explicit DayActions(const DayActions& other);
 
         virtual DayActions* randomDayActions() const;//v
@@ -66,7 +72,6 @@ class DayActions : public Chromosome
         double goalFunction()const;
         Chromosome* randomChromosome() const;
         std::string toString() const;
-
 
         virtual ~DayActions();
 };

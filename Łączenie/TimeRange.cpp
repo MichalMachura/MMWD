@@ -7,7 +7,7 @@
 
 TimeRange::TimeRange(){
 		begin = 0;
-		end = 24*60;    //bo teraz by³by problem z setter'ami gdyby chcieæ zmieniæ pocz¹tek najpierw na >1, a end bylby 1 to niezmieni
+		end = 24*60;    //bo teraz byÂ³by problem z setter'ami gdyby chcieÃ¦ zmieniÃ¦ poczÂ¹tek najpierw na >1, a end bylby 1 to niezmieni
 };
 
 TimeRange::TimeRange(const TimeRange& _timeRange){
@@ -72,10 +72,15 @@ TimeRange TimeRange::randomTimeRange(int _begin,int _end){
 }
 
 TimeRange TimeRange::randomTimeRange(int _begin,int _end,int _length){
-	int rndBegin = generateRandom(_begin,  _end-_length);
-	int rndEnd = rndBegin+_length;
-	TimeRange rndTimeRange (rndBegin, rndEnd);
-	return rndTimeRange;
+    if(_length > _end - _begin)
+        return TimeRange(_begin,_end);
+    else
+        {
+        int rndBegin = generateRandom(_begin,  _end-_length);
+        int rndEnd = rndBegin+_length;
+        TimeRange rndTimeRange (rndBegin, rndEnd);
+        return rndTimeRange;
+        }
 };
 
 

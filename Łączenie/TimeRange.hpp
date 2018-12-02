@@ -56,6 +56,7 @@ public:
 
 	static TimeRange randomTimeRange();									// losowy przedzial czasu w jednej dobie
 	static TimeRange randomTimeRange(int _begin,int _end);					// losowy przedzial czasu miedzy podanymi wartosciami czasu
+	static TimeRange randomTimeRange(const TimeRange& range, int length_); //losowy przedział o okreeślonej długości w przedziale range
 	static TimeRange randomTimeRange(int _begin,int _end,int _length);		// losowy przedzial czasu miedzy podanymi wartosciami czasu
 																		// ale o okreslonej dlugosci
     	// ---- isEqual(Action&) ----
