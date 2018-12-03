@@ -11,6 +11,7 @@ class Chromosome
         virtual double goalFunction()const = 0;
         virtual Chromosome* randomChromosome() const = 0;
         virtual std::string toString() const = 0;
+        virtual Chromosome* clone() const = 0;
 
         friend std::ostream& operator<<(std::ostream& out, const Chromosome& ch);
 

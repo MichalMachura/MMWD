@@ -39,6 +39,8 @@
         double goalFunction()const;
         Chromosome* randomChromosome() const;
         std::string toString() const;
+        Chromosome* clone() const;
+
         ~DwieFunkcje();
 
         DwieFunkcje& operator=(const DwieFunkcje& other);

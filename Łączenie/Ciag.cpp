@@ -105,3 +105,10 @@ std::string Ciag::toString() const
 
     return str.str();
     }
+
+Chromosome* Ciag::clone() const
+    {
+    Ciag* ans = new Ciag(*this);
+
+    return ans;
+    }

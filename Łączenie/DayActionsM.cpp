@@ -593,6 +593,11 @@ std::string DayActions::toString() const
     return str.str();
     }
 
+Chromosome* DayActions::clone() const
+    {
+    DayActions* ans = new DayActions(*this);
 
+    return ans;
+    }
 
 

@@ -183,4 +183,9 @@ DwieFunkcje::DwieFunkcje(const DwieFunkcje& other)
     }
 
 
+Chromosome* DwieFunkcje::clone() const
+    {
+    DwieFunkcje* ans = new DwieFunkcje(*this);
 
+    return ans;
+    }

@@ -23,6 +23,7 @@ class Ciag : public Chromosome
         double goalFunction() const;
         Chromosome* randomChromosome() const;
         std::string toString() const;
+        Chromosome* clone() const;
 
         virtual ~Ciag(){;}
     };

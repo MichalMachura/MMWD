@@ -27,17 +27,17 @@ void GeneticAlgorithm::startRandomPopulation()
 
 void GeneticAlgorithm::findBest()
     {
-    if(!population.size())
-        return;
-
-    current_best.clear();
-
     class Pair      //help class
         {
         public:
             double val;
             unsigned int index;
         };
+
+    if(!population.size())
+        return;
+
+    current_best.clear();
 
     std::vector<Pair> goal(population.size()); //vector with value of goalFun and index of chromosome in population
 
@@ -147,6 +147,7 @@ bool GeneticAlgorithm::bestIsReached()
         if(++current_number_of_repeted_suboptimal_solution >= NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION-1)
             {
             reason_of_break = "Minimum difference between populations has been reached.";
+            min_between_bests = true;
 
             return true;
             }
@@ -157,21 +158,24 @@ bool GeneticAlgorithm::bestIsReached()
     return false;
     }
 
-Chromosome* GeneticAlgorithm::startAlgorithm(bool display)
+Chromosome* GeneticAlgorithm::startAlgorithm(bool display, unsigned int period_of_cycling_break)
     {
     if(!previous_best)
         throw "Previous_best is nullptr. Can not create population without any representative of class which implements Chromosome interface";
     try
         {
-        generateCurrentValuesOfState(); //generation random values of best and population number
+        if(current_iteration == 0)
+            {
+            generateCurrentValuesOfState(); //generation random values of best and population number
 
-        if(population.size() > current_population_size)    //checking with started population
-            current_population_size = population.size();
+            if(population.size() > current_population_size)    //checking with started population
+                current_population_size = population.size();
 
-        startRandomPopulation();
-        findBest();
+            startRandomPopulation();
+            findBest();
+            }
 
-        while(current_iteration < max_of_iteration) //iteration condition
+        while(current_iteration < max_of_iteration && !min_between_bests) //iteration condition
             {
             //variables for result of counting places for crossing and mutation
             int places_for_mutation, places_for_crossing;
@@ -198,12 +202,15 @@ Chromosome* GeneticAlgorithm::startAlgorithm(bool display)
             if(display) //if it should be displayed every iteration
                 //output<<*this;
                 status(output);
+
+            if(period_of_cycling_break != 0 && !(current_iteration % period_of_cycling_break))
+                break;
             }
 
         if(current_iteration >= max_of_iteration)   //if max iteration has been reached
             reason_of_break = "Maximum iteration has been reached.";
 
-        return current_best[0];
+        return current_best[0]->clone();
         }
     catch(std::string s)
         {
@@ -216,13 +223,9 @@ Chromosome* GeneticAlgorithm::startAlgorithm(bool display)
         }
     }
 
-Chromosome* GeneticAlgorithm::restart(Chromosome* start_object ,double min_diffrence_between_generations_best_,unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_, unsigned int max_of_iteration_, unsigned int max_population_size_, unsigned int max_best_, std::vector<Chromosome*> population_)
+void GeneticAlgorithm::restart(Chromosome* start_object ,double min_diffrence_between_generations_best_,unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_, unsigned int max_of_iteration_, unsigned int max_population_size_, unsigned int max_best_, std::vector<Chromosome*> population_)
     {
-    deleteAllChromosomes();
-
     setMaxValuesOfParameters(start_object,min_diffrence_between_generations_best_, NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_,max_of_iteration_, max_population_size_,max_best_, population_);
-
-    return startAlgorithm();
     }
 
 void GeneticAlgorithm::deleteAllChromosomes()
@@ -240,7 +243,7 @@ void GeneticAlgorithm::deleteAllChromosomes()
 void GeneticAlgorithm::setMaxValuesOfParameters(Chromosome* start_object ,double min_diffrence_between_generations_best_,unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_, unsigned int max_of_iteration_, unsigned int max_population_size_, unsigned int max_best_, std::vector<Chromosome*> population_)
     {
     if(!start_object)
-        throw "Previous_best is nullptr. Can not create population without any representative of class which implements Chromosome interface";
+        throw "Start_object is nullptr. Can not create population without any representative of class which implements Chromosome interface";
 
     deleteAllChromosomes(); //clearing after previous
 
@@ -248,7 +251,7 @@ void GeneticAlgorithm::setMaxValuesOfParameters(Chromosome* start_object ,double
     NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION = NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_;     //setting of repeating the solution similar or the same as the answer or next / previous solution
 
     //create new random chromosome from start object
-    previous_best = start_object->randomChromosome();
+    previous_best = start_object->clone();
     population.push_back(previous_best);
 
     //minimum difference between previous and current best
@@ -394,3 +397,10 @@ GeneticAlgorithm::~GeneticAlgorithm()
     {
     deleteAllChromosomes();
     }
+
+Chromosome* GeneticAlgorithm::resume(bool display, unsigned int period_of_cycling_break)
+    {
+    return startAlgorithm(display, period_of_cycling_break);
+    }
+
+

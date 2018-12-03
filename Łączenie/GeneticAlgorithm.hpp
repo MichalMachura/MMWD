@@ -11,6 +11,7 @@
 #include<sstream>
 #include<iostream>
 #include "generateRandom.hpp"
+//const unsigned int thread_number = 10;
 
 class GeneticAlgorithm
     {
@@ -25,6 +26,7 @@ class GeneticAlgorithm
         unsigned int current_iteration = 0;
         unsigned int current_number_of_repeted_suboptimal_solution = 0;
         std::string reason_of_break = std::string("Unknown reason of break.");
+        bool min_between_bests = false;
 
         //constants
         static const unsigned int MIN_FOR_CROSSING = 60;
@@ -56,8 +58,9 @@ class GeneticAlgorithm
     public:
         GeneticAlgorithm(std::ostream& output_, Chromosome* start_object ,double min_diffrence_between_generations_best_,unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_ = 1, unsigned int max_of_iteration_ = 20,unsigned int population_size_ = 20,unsigned int max_best_ = 3, std::vector<Chromosome*> population_ = std::vector<Chromosome*>());
 
-        Chromosome* startAlgorithm(bool display = false);//true displaying every iteration
-        Chromosome* restart(Chromosome* start_object ,double min_diffrence_between_generations_best_,unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_ = 1, unsigned int max_of_iteration_ = 20,unsigned int population_size_ = 20,unsigned int max_best_ = 3, std::vector<Chromosome*> population_ = std::vector<Chromosome*>());
+        Chromosome* startAlgorithm(bool display = false, unsigned int period_of_cycling_break = 0);//true displaying every iteration
+        void restart(Chromosome* start_object ,double min_diffrence_between_generations_best_,unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_ = 1, unsigned int max_of_iteration_ = 20,unsigned int population_size_ = 20,unsigned int max_best_ = 3, std::vector<Chromosome*> population_ = std::vector<Chromosome*>());
+        Chromosome* resume(bool display = false, unsigned int period_of_cycling_break = 0);
 
         //setters
         void setMaxOfIteration(unsigned int max_of_iteration_);

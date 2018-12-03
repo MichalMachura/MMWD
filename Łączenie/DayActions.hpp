@@ -70,6 +70,8 @@ class DayActions : public Chromosome
         Chromosome* mutation() const;
         double goalFunction()const;
         Chromosome* randomChromosome() const;
+        Chromosome* clone() const;
+
         std::string toString() const;
 
         virtual ~DayActions();

@@ -41,10 +41,23 @@ int main()
         clock_t start_time, end_time;
 
         //(wyswietlanie ,chrom. , roznica, liczba powtorzen wyniku, max iter.,max. populacja, max liczba wybieranych najlepszych)
-        GeneticAlgorithm genAlg = GeneticAlgorithm(cout,&ch,1.0,15,100,300,15);
+        GeneticAlgorithm genAlg = GeneticAlgorithm(cout,&ch,0.1,15,100,300,15);
 
         start_time = clock();
-        Chromosome* ans = genAlg.startAlgorithm(true);
+        Chromosome* ans = genAlg.startAlgorithm(true,1);
+
+
+        while(abc != 'q')
+            {
+            delete ans;
+
+            ans = genAlg.resume(true,1);
+
+            cin>>abc;
+            }
+
+
+
         end_time = clock();
         cout<<genAlg<<endl<<endl;
         genAlg.status(cout);
@@ -52,9 +65,9 @@ int main()
 
         cout<<"Execution time : "<<end_time-start_time<<endl;
 
-
+        delete ans;
         //start_time = clock();
-        //ans = genAlg.restart(&ch,0,10,1000,2000,3);
+        //genAlg.restart(&ch,0,10,1000,2000,3);
         //end_time = clock();
         //cout<<"RESTART : \n\n"<<genAlg<<endl<<endl<<"Execution time : "<<end_time-start_time<<endl;
 
