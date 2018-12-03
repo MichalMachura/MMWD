@@ -6,7 +6,6 @@ void DayActions::sort() //setting and removing flags
         return;
 
     bool flag = false;
-    int i = 0, j = 0;
 
     for(int j = collection.size()-1; j > 0; --j)
         {
@@ -21,18 +20,42 @@ void DayActions::sort() //setting and removing flags
                 collection[i+1] = temporary;
                 flag = true;    //ustwienie flagi gdy nast¹pi zmiana
                 }
+            else if(z == 0)
+                {
+                if(collection[i]->getBegin() >= collection[i+1]->getBegin() && collection[i]->getEnd() <= collection[i+1]->getEnd())
+                    {//i is contained in i+1
+                    delete collection[i];
+                    collection[i] = nullptr;
+                    collection.erase(collection.begin()+ i);
+                    --i;
+                    --j;
+                    }
+                else if(collection[i]->getBegin() <= collection[i+1]->getBegin() && collection[i]->getEnd() >= collection[i+1]->getEnd())
+                    {//i+1 is contained in i
+                    delete collection[i+1];
+                    collection[i+1] = nullptr;
+                    collection.erase(collection.begin()+ i+1);
+                    --j;
+                    }
+                else if(collection[i]->getBegin() >= collection[i+1]->getBegin())//only overlapping
+                    {
+                    Action* temporary = collection[i];
+                    collection[i] = collection[i+1];
+                    collection[i+1] = temporary;
+                    }
+                }
+
             }
 
         if(!flag)   //gdy flaga nie ustawiona konczymy sortowanie
             break;
 
         modified = true;        //setting and removing flags
-        updated_factors = false;
 
         flag = false;   //reset flagi, gdy jest ustawiona dla nastêpnej pêtli
         }
 
-    deleteOverlapping();
+    //deleteOverlapping();
     }
 
 void DayActions::deleteOverlapping()
@@ -41,7 +64,7 @@ void DayActions::deleteOverlapping()
         return;
 
     bool ans = false;
-    for(int z = 0; z < collection.size(); ++z)
+    for(unsigned int z = 0; z < collection.size(); ++z)
         {
         for(int i = 0; i < int(collection.size())-1; ++i)
             if(collection[i]->isEqual(collection[i+1]) == 0)
@@ -73,7 +96,6 @@ void DayActions::deleteOverlapping()
         if(ans)
             {
             modified = true;        //setting and removing flags
-            updated_factors = false;
             ans = false;
             continue;
             }
@@ -271,7 +293,7 @@ bool DayActions::deleteRange(TimeRange& range)  //setting flag modified and remo
     bool ans = true;
     int first = 0, num_to_erase = 0;
 
-    for(int i = 0; i < collection.size() ; ++i)
+    for(unsigned int i = 0; i < collection.size() ; ++i)
         {
         Action* x = collection[i];
 
@@ -341,7 +363,7 @@ bool DayActions::deleteRange(TimeRange& range)  //setting flag modified and remo
         }
 
     modified = true;        // setting and removing flags
-    updated_factors = false;
+
     return ans;
     }
 
@@ -363,7 +385,6 @@ void DayActions::setPart(std::vector<Action*>* part, Factors& start_part_factors
     delete part;
 
     modified = true;        //setting and removing flags
-    updated_factors = false;
     }
 
 Chromosome* DayActions::randomChromosome() const
@@ -379,8 +400,6 @@ void DayActions::updateFactors()   //setting flag updated_factors
     for(Action* x : collection)
         x->update(&collection, start_factors);
 
-    updated_factors = true; //setting flag
-
     goal_function_value = goalFunction();
     }
 
@@ -393,16 +412,14 @@ void DayActions::checkRestrictionsAndRetake()   //removing modified and updated_
             x(&collection,this);
 
     modified = false;   //setting flag
-    updated_factors = false;
     }
 
 bool DayActions::removeAction(Action* action)   //setting flag modified and removing updated_factors
     {
-    for(int i = 0; i< collection.size(); ++i)
+    for(unsigned int i = 0; i < collection.size(); ++i)
         if(action == collection[i])
             {
             modified = true;    // setting flag
-            updated_factors = false;
             collection.erase(collection.begin()+i);
             updateFactors();    //updating
 
@@ -414,7 +431,7 @@ bool DayActions::removeAction(Action* action)   //setting flag modified and remo
 
 double DayActions::goalFunction() const   //return value of goal function
     {
-    if(!updated_factors)        //if was some modification
+    if(modified)        //if was some modification
         throw(std::string("Call to double \'DayAction::goalFunction() const\' without update."));//updateFactors();
 
     return goal_function->goalFunction(&collection,start_factors);
@@ -433,7 +450,6 @@ void DayActions::deleteAllActionsAndGoalFunction()
     goal_function = nullptr;
 
     modified  = true;       //setting and removing flags
-    updated_factors = false;
     }
 
 DayActions::~DayActions()
@@ -462,7 +478,7 @@ DayActions::DayActions(std::shared_ptr<GoalFunction> goalFunction_, const std::v
     goal_function = goalFunction_;
 
     modified = false;
-    updated_factors = true;
+
     goal_function_value = 0.0;
     }
 
@@ -476,7 +492,6 @@ DayActions& DayActions::operator=(const DayActions& other)
     check_functions = other.check_functions;
 
     modified = other.modified;
-    updated_factors = other.updated_factors;
     start_factors  = other.start_factors;
 
     goal_function = other.goal_function;
@@ -484,6 +499,8 @@ DayActions& DayActions::operator=(const DayActions& other)
 
     for(Action* x : other.collection)   //cloning actions in the same order
         collection.push_back(x->clone());
+
+    return *this;
     }
 
 DayActions::DayActions(const DayActions& other)
@@ -504,8 +521,7 @@ DayActions* DayActions::randomDayActions() const
     for(int i = 0; i <number_of_actions ; i++)
         answer->addRandomAction();  //adding random Action
 
-    answer->updated_factors = false;
-    answer->modified = true;
+    answer->modified = true;;
 
 
     answer->updateFactors();
@@ -521,7 +537,7 @@ TimeRange findMaxFreeTimeRange(const std::vector<Action*>& collection, int start
     TimeRange current_max_range(start,collection[0]->getBegin());  //for start to saving the best range
     int previous_end = collection[0]->getEnd();     //ending of previous action
 
-    for(int i = 1; i < collection.size(); ++i)
+    for(unsigned int i = 1; i < collection.size(); ++i)
         {
         Action* x = collection[i];
 
@@ -559,7 +575,6 @@ void DayActions::addRandomAction()
     Action* addedAction = (class_types[random_type_num])->randomAction(random_part_of_range); //creating random action
 
     modified = true;
-    updated_factors = false;
 
     collection.push_back(addedAction);  //adding
     }
@@ -572,7 +587,7 @@ std::string DayActions::toString() const
     for(Action* x : collection)
         str<<x->toString();
 
-    str<<"\nFlags:\nmodified: "<<modified<<"\nupdated_factors: "<<updated_factors<<"\n";
+    str<<"\nFlags:\nmodified: "<<modified<<"\n";
     str<<"goal function value => "<<goal_function_value<<" <=\n";
 
     return str.str();

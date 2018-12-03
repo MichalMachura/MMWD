@@ -30,7 +30,6 @@ class DayActions : public Chromosome
         static const int start_ = 0;
         static const int end_ = 60*24;
         bool modified;
-        bool updated_factors;
         Factors start_factors;
         std::vector<Action*> collection;
         std::shared_ptr<GoalFunction> goal_function;

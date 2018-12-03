@@ -23,19 +23,6 @@ void GeneticAlgorithm::startRandomPopulation()
 
         population.push_back(ch);
         }
-
-
-
-//    vector<std::thread> th(current_population_size - population.size();)    //threads vector
-//
-//    unsigned int i =0;
-//    while(population.size()<current_population_size)
-//        {
-//        th[i++] = std::thread([&]{population.push_back(previous_best.randomChromosom());}); //add to thread
-//        }
-//
-//    for(std::thread& x : th)
-//        x.join();               //joining all threads
     }
 
 void GeneticAlgorithm::findBest()
@@ -274,7 +261,7 @@ void GeneticAlgorithm::setMaxValuesOfParameters(Chromosome* start_object ,double
     setMaxBest(max_best_);
     }
 
-void GeneticAlgorithm::setMinDifferenceBetweenGenarationsBest(int min_diffrence_between_generations_best_)
+void GeneticAlgorithm::setMinDifferenceBetweenGenarationsBest(double min_diffrence_between_generations_best_)
     {
     if(min_diffrence_between_generations_best_ < 0.0)
         min_diffrence_between_generations_best = 0.0;
@@ -282,7 +269,7 @@ void GeneticAlgorithm::setMinDifferenceBetweenGenarationsBest(int min_diffrence_
         min_diffrence_between_generations_best = min_diffrence_between_generations_best_;
     }
 
-void GeneticAlgorithm::setMaxOfIteration(int max_of_iteration_)
+void GeneticAlgorithm::setMaxOfIteration(unsigned int max_of_iteration_)
     {
     if(max_of_iteration_ < MIN_ITERATION)   //if is less than minimum
         max_of_iteration = MIN_ITERATION;
@@ -290,7 +277,7 @@ void GeneticAlgorithm::setMaxOfIteration(int max_of_iteration_)
         max_of_iteration = max_of_iteration_;
     }
 
-void GeneticAlgorithm::setMaxPopulationSize(int max_population_size_)
+void GeneticAlgorithm::setMaxPopulationSize(unsigned int max_population_size_)
     {
     if(max_population_size_ <= MIN_POPULATION_SIZE) //if set max is less than constant min
         max_population_size = MIN_POPULATION_SIZE + 1;
@@ -298,7 +285,7 @@ void GeneticAlgorithm::setMaxPopulationSize(int max_population_size_)
         max_population_size = max_population_size_;
     }
 
-void GeneticAlgorithm::setMaxBest(int max_best_)
+void GeneticAlgorithm::setMaxBest(unsigned int max_best_)
     {
     if(max_best_ <= MIN_BEST)   //if max is less than min
         max_best = MIN_BEST + 1;

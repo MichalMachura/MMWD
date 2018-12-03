@@ -9,7 +9,7 @@ Factors CoffeeAndSleepGoalFunction::getFactorsAt(int time, const Factors& start_
     Factors previous_factors = start_factors;
     int previous_end = 0;
 
-    for(int i = 0; i < collection_->size(); ++i)
+    for(int i = 0; i < (int)collection_->size(); ++i)
         {
         Action* x = (*collection_)[i];
 

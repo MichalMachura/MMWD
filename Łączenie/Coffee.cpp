@@ -2,7 +2,7 @@
 
 //--------------- COFFEE ------------------------
 double Coffee::A_MULTIPLIER = 1;
-double Coffee::Y_MULTIPLIER = 3;
+double Coffee::Y_MULTIPLIER = 1;//3
 
 
 Coffee::Coffee(){
@@ -101,7 +101,7 @@ void Coffee::checkRestrictionAndRetake(std::vector<Action*>*collection, DayActio
 void Coffee::factorsAfter(Action* previousAction, int current_total_coffee_quantity){
 
 	double alpha_modifier = modificationAlpha(this->coffee_quantity,current_total_coffee_quantity); //modyfikator współczynnika a
-	double y_modifier= increaseY(this->coffee_quantity);    //modyfaikator wartości y
+	double y_modifier = increaseY(this->coffee_quantity);    //modyfaikator wartości y
 	Factors previousFactors = previousAction->getFactorsAfter();
 
     int TimeBetween = (this->begin_end.getBegin()) - (previousAction->getTimeRange().getEnd());
@@ -109,7 +109,7 @@ void Coffee::factorsAfter(Action* previousAction, int current_total_coffee_quant
 	if (TimeBetween<0)
 		return;
 
-	double newY = std::min(previousFactors.getY()-previousFactors.getA()*TimeBetween+y_modifier, Factors::MAX_Y);
+	double newY = std::min(previousFactors.getY()-previousFactors.getA()*TimeBetween*(1+y_modifier/100), Factors::MAX_Y);
 	double newA = previousFactors.getA() * alpha_modifier;
 
 	factors_after = Factors(newY, newA);

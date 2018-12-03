@@ -78,7 +78,7 @@ void Sleep::connectNearest(std::vector<Action*>* collection, DayActions* dayActi
 
 void Sleep::deleteToShortSleeps(std::vector<Action*>* collection, DayActions* dayActions)
     {
-    for(int i = 0; i < collection->size(); ++i)
+    for(unsigned int i = 0; i < collection->size(); ++i)
         {
         Sleep* sl = dynamic_cast<Sleep*>((*collection)[i]);
         if(sl != nullptr && sl->begin_end.length() < MIN_SLEEP)
@@ -144,12 +144,12 @@ int Sleep::sumSleeps(std::vector<Action*>* collection)
 
 
 Factors Sleep::factorsAfter(){
-	double newA;
-	int lenSleep = begin_end.length();
-	newA = alph(lenSleep);
-	Factors newFactors(Factors::MAX_Y, newA);
-	factors_after = newFactors;
-	return newFactors;
+	double newA = alph(begin_end.length());
+
+	factors_after.setY(Factors::MAX_Y);
+	factors_after.setA(newA);
+
+	return factors_after;
 }
 
 

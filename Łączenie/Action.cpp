@@ -28,6 +28,7 @@ bool Action::setEnd(int _end){
 	return begin_end.setEnd(_end);
 };
 
+
 void Action::setTimeRange(TimeRange range)
     {
     begin_end = range;
