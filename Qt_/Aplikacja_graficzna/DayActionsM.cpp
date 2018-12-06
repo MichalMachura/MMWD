@@ -602,10 +602,8 @@ Chromosome* DayActions::clone() const
 
 void DayActions::setStartFactors(Factors st_factors)
     {
-    std::cout<<"onlyupdate1()\n";
-
     start_factors = st_factors;
-    std::cout<<"onlyupdate2()\n";
+
     onlyUpdate();
     }
 
@@ -623,14 +621,21 @@ void DayActions::removeAllActions()
 void DayActions::onlyUpdate()
     {
     sort();
-    std::cout<<"onlyupdate3()\n";
     for(Action* x : collection)
         x->update(&collection, start_factors);
 
     modified = false;
     goal_function_value = goalFunction();
+    modified = true;
     }
 
+void DayActions::removeFromRange(TimeRange& tr)
+    {
+    deleteRange(tr);
+    modified = true;
+
+    onlyUpdate();
+    }
 
 
 

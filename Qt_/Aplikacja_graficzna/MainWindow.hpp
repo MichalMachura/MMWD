@@ -49,6 +49,10 @@ class MainWindow : public QMainWindow
         int coffee_quantity = 0;
         QTime sleep_begin = QTime(0,0);
         QTime sleep_end = QTime(0,0);
+        QTime del_beg = QTime(0,0);
+        QTime del_end = QTime(0,0);
+
+        void updateDayActionDistplay();
 
     public:
         explicit MainWindow(QWidget *parent = nullptr);
@@ -66,7 +70,9 @@ class MainWindow : public QMainWindow
         void whenDodajSenClicked();
         void whenUsunAkcjeClicked();
         void whenSprawdzOgraniczeniaIPoprawClicked();
-
+        void whenDelBegChanged(QTime);
+        void whenDelEndChanged(QTime);
+        void whenDeleteRangeClicked();
 
 
     signals:

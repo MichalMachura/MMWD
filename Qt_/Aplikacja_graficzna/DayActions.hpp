@@ -63,6 +63,7 @@ class DayActions : public Chromosome
         bool removeAction(Action*);
         void removeAllActions();
         void updateFactors();
+        void removeFromRange(TimeRange&);
 
         DayActions* replacePart(const DayActions*, TimeRange&) const;
         TimeRange getMaxFreeTimeRange();

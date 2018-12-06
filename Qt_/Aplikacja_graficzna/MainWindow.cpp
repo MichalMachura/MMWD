@@ -25,18 +25,31 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->textBrowser->setText(QString::fromStdString(dayAction->toString()));
 
-
+    //współczynniki startowe
     connect(ui->startFactors_y,SIGNAL(valueChanged(int)),this,SLOT(whenStartFactorsY(int)));
     connect(ui->startFactors_a,SIGNAL(valueChanged(double)),this,SLOT(whenStartFactorsA(double)));
-    connect(ui->coffee_quantity,SIGNAL(valueChanged(int)),this,SLOT(whenCoffeeQuantity(int)));
-    connect(ui->sleepBegin,SIGNAL(userTimeChanged(QTime)),this,SLOT(whenSleepBeginChanged(QTime)));
-    connect(ui->sleepEnd,SIGNAL(userTimeChanged(QTime)),this,SLOT(whenSleepEndChanged(QTime)));
-    connect(ui->coffee_moment,SIGNAL(userTimeChanged(QTime)),this,SLOT(whenCoffeeMomentChanged(QTime)));
-    connect(ui->addSleep,SIGNAL(clicked()),this,SLOT(whenDodajSenClicked()));
-    connect(ui->addCoffee,SIGNAL(clicked()),this,SLOT(whenDodajKaweClicked()));
-    connect(ui->removeAddedActions,SIGNAL(clicked()),this,SLOT(whenUsunAkcjeClicked()));
     connect(ui->setStartFactors,SIGNAL(clicked()),this,SLOT(whenUstawClicked()));
 
+    //dodawanie snu
+    connect(ui->sleepBegin,SIGNAL(userTimeChanged(QTime)),this,SLOT(whenSleepBeginChanged(QTime)));
+    connect(ui->sleepEnd,SIGNAL(userTimeChanged(QTime)),this,SLOT(whenSleepEndChanged(QTime)));
+    connect(ui->addSleep,SIGNAL(clicked()),this,SLOT(whenDodajSenClicked()));
+
+    //dodawanie kawy
+    connect(ui->coffee_quantity,SIGNAL(valueChanged(int)),this,SLOT(whenCoffeeQuantity(int)));
+    connect(ui->coffee_moment,SIGNAL(userTimeChanged(QTime)),this,SLOT(whenCoffeeMomentChanged(QTime)));
+    connect(ui->addCoffee,SIGNAL(clicked()),this,SLOT(whenDodajKaweClicked()));
+
+    //usuwanie wszystkich czynności z dayAction
+    connect(ui->removeAddedActions,SIGNAL(clicked()),this,SLOT(whenUsunAkcjeClicked()));
+    connect(ui->check,SIGNAL(clicked()),this,SLOT(whenSprawdzOgraniczeniaIPoprawClicked()));
+
+    //usuwanie przedziału
+    connect(ui->deleteRangeBegin,SIGNAL(userTimeChanged(QTime)),this,SLOT(whenDelBegChanged(QTime)));
+    connect(ui->deleteRangeEnd,SIGNAL(userTimeChanged(QTime)),this,SLOT(whenDelEndChanged(QTime)));
+    connect(ui->deleteRange,SIGNAL(clicked()),this,SLOT(whenDeleteRangeClicked()));
+
+    //aktualizacja wyswietlania startowego dayAction
     connect(this,SIGNAL(updateDisplaingDayActions(QString)),ui->textBrowser,SLOT(setText(QString)));
 
     }
@@ -45,6 +58,12 @@ MainWindow::~MainWindow()
     {
     delete ui;
     }
+
+void MainWindow::updateDayActionDistplay()
+    {
+    ui->textBrowser->setText(QString::fromStdString(dayAction->toString()));
+    }
+
 
 void MainWindow::whenStartFactorsY(int yy)
     {
@@ -61,8 +80,10 @@ void MainWindow::whenUstawClicked()
     st_factors = Factors(y,a);
     dayAction->setStartFactors(st_factors);
 
-    ui->textBrowser->setText(QString::fromStdString(dayAction->toString()));
+    updateDayActionDistplay();
     }
+
+
 
 void MainWindow::whenCoffeeQuantity(int qq)
     {
@@ -72,17 +93,6 @@ void MainWindow::whenCoffeeQuantity(int qq)
 void MainWindow::whenCoffeeMomentChanged(QTime tt)
     {
     coffee_moment = tt;
-    }
-
-void MainWindow::whenSleepBeginChanged(QTime tt)
-    {
-    sleep_begin = tt;
-    }
-
-void MainWindow::whenSleepEndChanged(QTime tt)
-    {
-    sleep_end = tt;
-
     }
 
 void MainWindow::whenDodajKaweClicked()
@@ -96,7 +106,19 @@ void MainWindow::whenDodajKaweClicked()
         return;
         }
 
-    ui->textBrowser->setText(QString::fromStdString(dayAction->toString()));
+    updateDayActionDistplay();
+    }
+
+
+void MainWindow::whenSleepBeginChanged(QTime tt)
+    {
+    sleep_begin = tt;
+    }
+
+void MainWindow::whenSleepEndChanged(QTime tt)
+    {
+    sleep_end = tt;
+
     }
 
 void MainWindow::whenDodajSenClicked()
@@ -112,18 +134,41 @@ void MainWindow::whenDodajSenClicked()
         return;
         }
 
-    ui->textBrowser->setText(QString::fromStdString(dayAction->toString()));
+    updateDayActionDistplay();
     }
+
 
 void MainWindow::whenUsunAkcjeClicked()
     {
     dayAction->removeAllActions();
 
-    ui->textBrowser->setText(QString::fromStdString(dayAction->toString()));
+    updateDayActionDistplay();
     }
 
 void MainWindow::whenSprawdzOgraniczeniaIPoprawClicked()
     {
     dayAction->updateFactors();
-    ui->textBrowser->setText(QString::fromStdString(dayAction->toString()));
+    updateDayActionDistplay();
+    }
+
+
+void MainWindow::whenDelBegChanged(QTime tt)
+    {
+    del_beg = tt;
+    }
+
+void MainWindow::whenDelEndChanged(QTime tt)
+    {
+    del_end = tt;
+    }
+
+void MainWindow::whenDeleteRangeClicked()
+    {
+    int begin = del_beg == QTime(0,0) ? 0 :del_beg.hour()*60+del_beg.minute();
+    int end = del_end == QTime(0,0) ? 0 : del_end.hour()*60+del_end.minute();
+    TimeRange toDel(begin,end);
+
+    dayAction->removeFromRange(toDel);
+
+    updateDayActionDistplay();
     }
