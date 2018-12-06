@@ -1,0 +1,15 @@
+release/main.o
+release/MainWindow.o
+release/generateRandom.o
+release/Factors.o
+release/TimeRange.o
+release/TimeRangeM.o
+release/Action.o
+release/Sleep.o
+release/Coffee.o
+release/CoffeeAndSleepGoalFunction.o
+release/goalFunction.o
+release/addAction.o
+release/DayActionsM.o
+release/Chromosome.o
+release/moc_MainWindow.o

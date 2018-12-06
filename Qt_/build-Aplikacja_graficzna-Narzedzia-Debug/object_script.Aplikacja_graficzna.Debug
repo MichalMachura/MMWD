@@ -1,0 +1,15 @@
+debug/main.o
+debug/MainWindow.o
+debug/generateRandom.o
+debug/Factors.o
+debug/TimeRange.o
+debug/TimeRangeM.o
+debug/Action.o
+debug/Sleep.o
+debug/Coffee.o
+debug/CoffeeAndSleepGoalFunction.o
+debug/goalFunction.o
+debug/addAction.o
+debug/DayActionsM.o
+debug/Chromosome.o
+debug/moc_MainWindow.o
