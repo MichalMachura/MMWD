@@ -37,35 +37,34 @@ int main()
         std::shared_ptr<GoalFunction> gF = make_shared<CoffeeAndSleepGoalFunction>();
 
         DayActions ch(gF,vec,fun,st_factors);
-
+				ch.updateFactors();
         clock_t start_time, end_time;
 
         //(wyswietlanie ,chrom. , roznica, liczba powtorzen wyniku, max iter.,max. populacja, max liczba wybieranych najlepszych)
-        //GeneticAlgorithm genAlg = GeneticAlgorithm(cout,&ch,0.1,15,100,300,15);
+        GeneticAlgorithm genAlg = GeneticAlgorithm(cout,&ch,0.1,15,100,300,15);
 
         start_time = clock();
-        //Chromosome* ans = genAlg.startAlgorithm(true,1);
+        Chromosome* ans = genAlg.startAlgorithm(true,1);
 
-        /*while(abc != 'q')
+        while(abc != 'q')
             {
             delete ans;
 
             ans = genAlg.resume(true,1);
 
             cin>>abc;
-            }*/
+            }
 
         end_time = clock();
-        //cout<<genAlg<<endl<<endl;
-        //genAlg.status(cout);
-        //std::cout<<endl<<(*ans);
+/*        cout<<genAlg<<endl<<endl;
+        genAlg.status(cout);
+        std::cout<<endl<<(*ans);*/
 
-        Action* ac = new Sleep(60,0);
-        ch.addAction(ac);
-        ch.setStartFactors(Factors(0,0));
-        cout<<ac->toString()<<ch.toString()<<"Execution time : "<<end_time-start_time<<endl;
+				genAlg.savePopulation(cout);
 
-        //delete ans;
+        cout<<"Execution time : "<<end_time-start_time<<endl;
+
+        delete ans;
         //start_time = clock();
         //genAlg.restart(&ch,0,10,1000,2000,3);
         //end_time = clock();

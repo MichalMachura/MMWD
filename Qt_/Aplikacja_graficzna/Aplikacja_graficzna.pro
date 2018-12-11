@@ -26,11 +26,12 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        MainWindow.cpp generateRandom.cpp Factors.cpp TimeRange.cpp TimeRangeM.cpp Action.cpp Sleep.cpp Coffee.cpp CoffeeAndSleepGoalFunction.cpp goalFunction.cpp addAction.cpp DayActionsM.cpp Chromosome.cpp
+        MainWindow.cpp generateRandom.cpp Factors.cpp TimeRange.cpp TimeRangeM.cpp Action.cpp Sleep.cpp Coffee.cpp CoffeeAndSleepGoalFunction.cpp goalFunction.cpp addAction.cpp DayActionsM.cpp Chromosome.cpp GeneticAlgorithm.cpp
+
 
 
 HEADERS += \
-        MainWindow.hpp ui_MainWindow.h generateRandom.hpp Factors.hpp TimeRange.hpp Action.hpp Sleep.hpp Coffee.hpp CoffeeAndSleepGoalFunction.hpp GoalFunction.hpp DayActions.hpp Chromosome.hpp
+        MainWindow.hpp ui_MainWindow.h generateRandom.hpp Factors.hpp TimeRange.hpp Action.hpp Sleep.hpp Coffee.hpp CoffeeAndSleepGoalFunction.hpp GoalFunction.hpp DayActions.hpp Chromosome.hpp GeneticAlgorithm.hpp
 
 FORMS += \
         MainWindow.ui

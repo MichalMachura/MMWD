@@ -21,6 +21,9 @@ class CoffeeAndSleepGoalFunction : public GoalFunction
 
         double goalFunction(const std::vector<Action*>* collection, const Factors& start_factors) const;
         Factors getFactorsAt(int time, const Factors& start_factors_, const std::vector<Action*>* collection) const;
+
+        void setIntegral_Multi(double);
+        void setCoffee_Multi(double);
     };
 
 #endif // COFFEEANDSLEEPGOALFUNCTION_HPP

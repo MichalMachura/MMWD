@@ -27,7 +27,6 @@ public:
 	int getBegin() const;
 	int getEnd() const;
 	TimeRange getTimeRange() const;
-	//double getYmodifier() const;
 	Factors getFactorsAfter() const;
 
 	//---- SET FUNCTION ----

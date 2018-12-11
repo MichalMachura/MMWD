@@ -89,3 +89,16 @@ double CoffeeAndSleepGoalFunction::countLocalIntegral(Factors& previous_end_fact
 
     return (previous_end_factors.getY() + current_start_y)*time_interval/2;
     }
+
+void CoffeeAndSleepGoalFunction::setIntegral_Multi(double int_multi)
+    {
+    if(int_multi < 0)
+        multiplier_integral = 0;
+    else
+        multiplier_integral = int_multi;
+    }
+
+void CoffeeAndSleepGoalFunction::setCoffee_Multi(double cof_multi)
+    {
+    multiplier_coffee = cof_multi;
+    }

@@ -12,4 +12,5 @@ release/goalFunction.o
 release/addAction.o
 release/DayActionsM.o
 release/Chromosome.o
+release/GeneticAlgorithm.o
 release/moc_MainWindow.o

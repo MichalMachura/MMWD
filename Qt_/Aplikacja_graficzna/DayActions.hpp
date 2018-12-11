@@ -50,7 +50,6 @@ class DayActions : public Chromosome
         void deleteAllActionsAndGoalFunction();
         void addRandomAction();
         void deleteOverlapping();
-        void onlyUpdate();
 
 
     public:
@@ -62,7 +61,9 @@ class DayActions : public Chromosome
         bool addAction(Action*);
         bool removeAction(Action*);
         void removeAllActions();
-        void updateFactors();
+        void updateFactors(); //it's also checking restrictions
+        void onlyUpdate();
+        void setFlagModified();
         void removeFromRange(TimeRange&);
 
         DayActions* replacePart(const DayActions*, TimeRange&) const;

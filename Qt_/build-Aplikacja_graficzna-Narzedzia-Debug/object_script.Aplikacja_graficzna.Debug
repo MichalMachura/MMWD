@@ -12,4 +12,5 @@ debug/goalFunction.o
 debug/addAction.o
 debug/DayActionsM.o
 debug/Chromosome.o
+debug/GeneticAlgorithm.o
 debug/moc_MainWindow.o

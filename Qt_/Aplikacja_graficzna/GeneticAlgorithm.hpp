@@ -13,6 +13,16 @@
 #include "generateRandom.hpp"
 //const unsigned int thread_number = 10;
 
+struct settings_list
+    {
+    unsigned int max_of_iteration;  //maximum values
+    unsigned int max_best;
+    unsigned int max_population_size;
+
+    double min_diffrence_between_generations_best;
+    unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION;
+    };
+
 class GeneticAlgorithm
     {
     private:
@@ -53,6 +63,7 @@ class GeneticAlgorithm
         void generateCurrentValuesOfState();
         void countPlacesForCrossingAndMutation(int& places_for_crossing, int& places_for_mutation);
         bool bestIsReached();
+        void checkCondition();
 
 
     public:
@@ -67,25 +78,30 @@ class GeneticAlgorithm
         void setMinDifferenceBetweenGenarationsBest(double min_diffrence_between_generations_best_);
         void setMaxPopulationSize(unsigned int max_population_size_);
         void setMaxBest(unsigned int max_best_);
+        void setNumberOfRepeat(unsigned int num);
 
-        //geters
-        bool isEnd();
-        const std::vector<Chromosome*>* getPopulation();
-        const Chromosome* getTheBest();
-        unsigned int getIteration();
-        unsigned int getPopulationSize();
-        unsigned int getTheBestSize();
-        unsigned int getNumOfRepeatTheBest();
+        //getters
+        bool isEnd() const;
+        const std::vector<Chromosome*>* getPopulation() const;
+        const Chromosome* getTheBest() const;
+        unsigned int getIteration() const;
+        unsigned int getPopulationSize() const;
+        unsigned int getTheBestSize() const;
+        unsigned int getNumOfRepeatTheBest() const;
+        settings_list setSettings() const;
 
         //out
         friend std::ostream& operator<<(std::ostream& out, GeneticAlgorithm& obj);
         std::ostream& status(std::ostream&);
+        void savePopulation(std::ostream& out);
 
         ~GeneticAlgorithm();
     };
 
 std::ostream& operator<<(std::ostream& out, GeneticAlgorithm& obj);
 
+
+std::ostream& operator<<(std::ostream& out, settings_list& obj);
 #endif // GENETICALGORITHM_HPP
 
 

@@ -476,7 +476,7 @@ DayActions::DayActions(std::shared_ptr<GoalFunction> goalFunction_, const std::v
 
     goal_function = goalFunction_;
 
-    modified = false;
+    modified = true;
 
     goal_function_value = 0.0;
     }
@@ -638,6 +638,10 @@ void DayActions::removeFromRange(TimeRange& tr)
     }
 
 
+void DayActions::setFlagModified()
+    {
+    modified = true;
+    }
 
 
 

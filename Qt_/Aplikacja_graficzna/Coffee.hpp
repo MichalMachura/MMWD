@@ -17,8 +17,8 @@
 class Coffee : public Action{
 private:
 	int coffee_quantity;
-	const static int MAX_TOTAL_PER_DAY=1500; //1500ml dawka
-	const static int MIN_PORTION=60;  //60 ml porcja minimalna
+    static int MAX_TOTAL_PER_DAY; //1500ml dawka
+    static int MIN_PORTION;  //60 ml porcja minimalna
     static double A_MULTIPLIER;
     static double Y_MULTIPLIER;
 
@@ -52,9 +52,11 @@ public:
 	int getCoffeeQuantity() const;
 	static int  getMaxTotalPerDay();
 
-	void setCoffeeQuantity(int );
-	static void setA_Multiplier(double);
-	static void setY_Multiplier(double);
+    void setCoffeeQuantity(int );
+    static void setA_Multiplier(double);
+    static void setY_Multiplier(double);
+    static void setMinPortion(int);
+    static void setMaxPerDay(int);
 
 	// ---  checkRestrictionAndRetake(...)
 	//	Sprawdza czy nie przekroczono ilości kawy w wektorze

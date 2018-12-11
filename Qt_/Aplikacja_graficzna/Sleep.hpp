@@ -13,9 +13,10 @@
 
 class Sleep :public Action{
 private:
-	const static int MIN_SLEEP = 20; //jednorazowo minimum drzemki to 20min
-	const static int MIN_DAY_SLEEP = 180; //180 minut = 3h
-	Factors factorsAfter(); //funkcja pomocnicza, uzywana w Sleep::update(...)
+    static int MIN_SLEEP; //jednorazowo minimum drzemki to 20min
+    static int MIN_DAY_SLEEP; //180 minut = 3h
+    static double A_MULTIPLIER;
+    Factors factorsAfter(); //funkcja pomocnicza, uzywana w Sleep::update(...)
 
     /* ALPH(int m)
 	 *	 funkcja oblicza wspó³czynnik (alfa) spadku aktywnoœci
@@ -38,14 +39,16 @@ public:
 
 	// --- checkRestrictionAndRetake(std::vector<Action*>* collection) ---
 	// ! Wektor Collection MUSI!!! byc posegregowany CHRONOLOGICZNIE !
-	// funkcja zwraca:
-	// 	- false, gdy jest za mało snu w wektorze
-	//	- true w pozostałych przypadkach
 	// funkcja również łączy dwa przylegające sny w jeden.
 	static void checkRestrictionAndRetake(std::vector<Action*>* collection, DayActions* dayActions);
     static void deleteToShortSleeps(std::vector<Action*>* collection, DayActions* dayActions);
     static void completionSleepAtDayAction(std::vector<Action*>* collection, DayActions* dayActions);
     static void connectNearest(std::vector<Action*>* collection, DayActions* dayActions);
+
+    static void setA_Multiplier(double);
+    static void setMinSleep(int);
+    static void setMinTotalSleep(int);
+
 
 	// --- toString()
 	// 	do wyswietlania Sleep

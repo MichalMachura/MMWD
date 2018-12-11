@@ -158,6 +158,14 @@ bool GeneticAlgorithm::bestIsReached()
     return false;
     }
 
+void GeneticAlgorithm::checkCondition()
+    {
+    if(current_number_of_repeted_suboptimal_solution >= NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION || current_iteration >=max_of_iteration )
+        min_between_bests = true;
+    else
+        min_between_bests = false;
+    }
+
 Chromosome* GeneticAlgorithm::startAlgorithm(bool display, unsigned int period_of_cycling_break)
     {
     if(!previous_best)
@@ -174,6 +182,8 @@ Chromosome* GeneticAlgorithm::startAlgorithm(bool display, unsigned int period_o
             startRandomPopulation();
             findBest();
             }
+
+        checkCondition();
 
         while(current_iteration < max_of_iteration && !min_between_bests) //iteration condition
             {
@@ -208,8 +218,10 @@ Chromosome* GeneticAlgorithm::startAlgorithm(bool display, unsigned int period_o
             }
 
         if(current_iteration >= max_of_iteration)   //if max iteration has been reached
+            {
             reason_of_break = "Maximum iteration has been reached.";
-
+            min_between_bests = true; // to show that algorithm is ended
+            }
         return current_best[0]->clone();
         }
     catch(std::string s)
@@ -226,6 +238,7 @@ Chromosome* GeneticAlgorithm::startAlgorithm(bool display, unsigned int period_o
 void GeneticAlgorithm::restart(Chromosome* start_object ,double min_diffrence_between_generations_best_,unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_, unsigned int max_of_iteration_, unsigned int max_population_size_, unsigned int max_best_, std::vector<Chromosome*> population_)
     {
     setMaxValuesOfParameters(start_object,min_diffrence_between_generations_best_, NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_,max_of_iteration_, max_population_size_,max_best_, population_);
+
     }
 
 void GeneticAlgorithm::deleteAllChromosomes()
@@ -238,6 +251,8 @@ void GeneticAlgorithm::deleteAllChromosomes()
 
     previous_best = nullptr;
     current_best.clear();
+    current_iteration = 0;
+    min_between_bests = false;
     }
 
 void GeneticAlgorithm::setMaxValuesOfParameters(Chromosome* start_object ,double min_diffrence_between_generations_best_,unsigned int NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION_, unsigned int max_of_iteration_, unsigned int max_population_size_, unsigned int max_best_, std::vector<Chromosome*> population_)
@@ -404,17 +419,17 @@ Chromosome* GeneticAlgorithm::resume(bool display, unsigned int period_of_cyclin
     }
 
 //geters
-bool GeneticAlgorithm::isEnd()
+bool GeneticAlgorithm::isEnd() const
     {
     return min_between_bests;
     }
 
-const std::vector<Chromosome*>* GeneticAlgorithm::getPopulation()
+const std::vector<Chromosome*>* GeneticAlgorithm::getPopulation() const
     {
     return &population;
     }
 
-const Chromosome* GeneticAlgorithm::getTheBest()
+const Chromosome* GeneticAlgorithm::getTheBest() const
     {
     if(current_best.empty())
         return nullptr;
@@ -422,35 +437,53 @@ const Chromosome* GeneticAlgorithm::getTheBest()
     return current_best[0];
     }
 
-unsigned int GeneticAlgorithm::getIteration()
+unsigned int GeneticAlgorithm::getIteration() const
     {
     return current_iteration;
     }
 
-unsigned int GeneticAlgorithm::getPopulationSize()
+unsigned int GeneticAlgorithm::getPopulationSize() const
     {
     return population.size();
     }
 
-unsigned int GeneticAlgorithm::getTheBestSize()
+unsigned int GeneticAlgorithm::getTheBestSize() const
     {
     return current_best.size();
     }
 
-unsigned int GeneticAlgorithm::getNumOfRepeatTheBest()
+unsigned int GeneticAlgorithm::getNumOfRepeatTheBest() const
     {
     return NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION;
     }
 
+settings_list GeneticAlgorithm::setSettings() const
+    {
+    settings_list settings = { max_of_iteration, max_best, max_population_size,
+    min_diffrence_between_generations_best, NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION};
+
+    return settings;
+    }
+
+void GeneticAlgorithm::savePopulation(std::ostream& out)
+    {
+    for(Chromosome* x : population)
+        out<<(*x);
+    }
+
+void GeneticAlgorithm::setNumberOfRepeat(unsigned int num)
+    {
+    NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION = num;
+    }
 
 
+std::ostream& operator<<(std::ostream& out, settings_list& obj)
+    {
+    out<<obj.max_of_iteration<<'\n'<<obj.max_best<<'\n'<<obj.max_population_size<<'\n'<<obj.min_diffrence_between_generations_best<<
+         '\n'<<obj.NUMBER_OF_REPETED_SUBOPTIMAL_SOLUTION<<'\n';
 
-
-
-
-
-
-
+    return out;
+    }
 
 
 

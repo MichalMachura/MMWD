@@ -3,7 +3,8 @@
 //--------------- COFFEE ------------------------
 double Coffee::A_MULTIPLIER = 1;
 double Coffee::Y_MULTIPLIER = 3;//1
-
+int Coffee::MAX_TOTAL_PER_DAY=1500; //1500ml dawka
+int Coffee::MIN_PORTION=60;
 
 Coffee::Coffee(){
 	TimeRange tmpBegEnd(1,1);
@@ -85,14 +86,7 @@ void Coffee::checkRestrictionAndRetake(std::vector<Action*>*collection, DayActio
                 collection->erase(collection->begin()+i);
                 --i;
                 continue;
-				}
-            /*
-			Factors _afterCoffee;
-			if(i>0){
-				_afterCoffee = item->factorsAfter((*collection)[i-1]);
-				if(_afterCoffee.getY() > Factors::MAX_Y){
-					collection->erase(collection->begin()+i);
-				}*///saturacja w factorsAfter()
+                }
 			}
 		}
 };
@@ -197,3 +191,15 @@ void Coffee::setY_Multiplier(double y_multi)
         Y_MULTIPLIER = y_multi;
 
     }
+
+
+void Coffee::setMinPortion(int min)
+    {
+    MIN_PORTION = min;
+    }
+
+void Coffee::setMaxPerDay(int max)
+    {
+    MAX_TOTAL_PER_DAY = max;
+    }
+

@@ -2,6 +2,9 @@
 //--------------- SLEEP ------------------------
 
 
+double Sleep::A_MULTIPLIER =1;
+int Sleep::MIN_SLEEP = 20;
+int Sleep::MIN_DAY_SLEEP = 180;
 
 Sleep::Sleep(){
 	TimeRange beg_end(0, 20);
@@ -26,7 +29,7 @@ double Sleep::alph(int m){
 	 * w zale¿noœci od snu w minutach (m):
 	 */
 
-	return -(0.0000025*m*m-0.0021*m+0.504);
+    return -(0.0000025*m*m-0.0021*m+0.504)*A_MULTIPLIER;
 };
 
 
@@ -204,3 +207,24 @@ Action* Sleep::divideByRange(TimeRange &range){
 	else // kiedy range nie zawiera się w czasie trwania snu oraz gdy range zawiera cały sen!!!
 		return nullptr;
 }
+
+void Sleep::setA_Multiplier(double yy)
+    {
+    if(yy < 0.5)
+        A_MULTIPLIER = 0.5;
+    else if(yy > 2.0)
+        A_MULTIPLIER = 2.0;
+    else
+        A_MULTIPLIER = yy;
+    }
+
+
+void Sleep::setMinSleep(int min)
+    {
+    MIN_SLEEP = min;
+    }
+
+void Sleep::setMinTotalSleep(int min)
+    {
+    MIN_DAY_SLEEP = min;
+    }
