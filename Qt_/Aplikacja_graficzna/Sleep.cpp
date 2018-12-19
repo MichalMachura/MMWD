@@ -10,17 +10,20 @@ Sleep::Sleep(){
 	TimeRange beg_end(0, 20);
 	this->begin_end = beg_end;
 	factors_after = factorsAfter();
+	factors_before = Factors(0,0);
 }
 
 Sleep::Sleep (TimeRange _begin_end){
 	this->begin_end = _begin_end;
 	factors_after = factorsAfter();
+	factors_before = Factors(0,0);
 	}
 
 Sleep::Sleep (int _begin, int _end){
 	TimeRange beg_end(_begin, _end);
     this->begin_end = beg_end;
    	factors_after = factorsAfter();
+	factors_before = Factors(0,0);
 }
 
 double Sleep::alph(int m){
@@ -158,21 +161,40 @@ Factors Sleep::factorsAfter(){
 
 string Sleep::toString() const{
 	std::stringstream text;
-    text<<"SLEEP:\t"<<Action::toString()<<"\tLength: "<<minToString(begin_end.length())<<"\n";
+	text<<"Sleep:\n"<<Action::toString()<<"Length: "<<minToString(begin_end.length())<<"\n";
 
 	return text.str();
 };
 
 
 void Sleep::update(std::vector<Action*>* collection, Factors& start_factors){
+	int previous_time = 0;
+	Factors previous_factors = start_factors;
 
-	for (unsigned int i = 0; i < collection->size(); i++){
-		Sleep* item = dynamic_cast<Sleep*>((*collection)[i]);
-		if(item){
+	for (unsigned int i = 0; i < collection->size(); i++)
+		{
+		Action* x = (*collection)[i];
+
+		Sleep* item = dynamic_cast<Sleep*>(x);
+
+		if(item == this)
+			{
+			int TimeBetween = item->getBegin() - (previous_time);
+			double previous_y = previous_factors.getY() + previous_factors.getA() * TimeBetween;
+
+			if(previous_y < 0)
+				previous_y  = 0;
+
+			factors_before = Factors( previous_y, previous_y >= 0 ? previous_factors.getA() : 0 );
+
 			item->factorsAfter();
+			return;
+			}
+
+		previous_time = x->getEnd();
+		previous_factors = x->getFactorsAfter();
 		}
 	}
-}
 
 Action* Sleep::randomAction(TimeRange range) const{
 	Sleep* ptrSleep = new Sleep(range);
@@ -210,10 +232,10 @@ Action* Sleep::divideByRange(TimeRange &range){
 
 void Sleep::setA_Multiplier(double yy)
     {
-    if(yy < 0.5)
+	if(yy < 0.5)
         A_MULTIPLIER = 0.5;
-    else if(yy > 2.0)
-        A_MULTIPLIER = 2.0;
+	else if(yy > 5)
+		A_MULTIPLIER = 5;
     else
         A_MULTIPLIER = yy;
     }
@@ -228,3 +250,32 @@ void Sleep::setMinTotalSleep(int min)
     {
     MIN_DAY_SLEEP = min;
     }
+
+std::vector<Point> Sleep::getActivityDuring() const
+	{
+	std::vector<Point> vec(4);
+	vec[0] = Point(getBegin(),factors_before.getY());
+	vec[1] = Point(getBegin(),0.0);
+	vec[2] = Point(getEnd(),0.0);
+	vec[3] = Point(getEnd(),factors_after.getY());
+
+	return vec;
+	}
+
+std::shared_ptr<Action> Sleep::createFromStream(std::istream& in)
+	{
+	std::shared_ptr<Sleep> sleep = nullptr;
+
+	TimeRange tr;
+	Factors factors;
+	int len = -1;
+	std::string read;
+
+	if( !Action::readFromFile(in,factors,tr) || !(std::cout<<read) || !(in>>read) || read != "Length:" || !stringTimeToInt(in, len) )
+		return sleep;
+
+	sleep = std::make_shared<Sleep>(tr);
+	sleep->factors_after = factors;
+
+	return  sleep;
+	}

@@ -10,23 +10,6 @@ int TimeRange::isEqual(const TimeRange& second) const
         return 1;
     else
         return 0;
-
-    /*
-    int difference_this = end - begin;
-    int difference_second = second.end- second.begin;// ranges lengths
-    int difference_begin_second_end_this = end - second.begin;     //between ranges
-    int difference_ranges;  //between this begin and second end
-
-    if(difference_begin_second_end_this < 0)        //if this is earlier than second
-        return difference_begin_second_end_this;
-
-    difference_ranges = begin - second.end;
-
-    if(difference_ranges > 0)   //if this is later than second
-        return difference_ranges;
-    else        //they're containing in part or whole
-        return 0;
-    */
     }
 
 TimeRange& TimeRange::operator=(const TimeRange& second)
@@ -73,3 +56,62 @@ TimeRange TimeRange::randomTimeRange(const TimeRange& range, int length_)
     {
     return randomTimeRange(range.begin,range.end, length_);
     }
+
+
+bool operator>>(std::istream& in, TimeRange& range)
+	{
+	int beg;
+	int end;
+	std::string read;
+
+	if( !(in.good()) )
+		return false;
+
+	if( !(in>>read) || read != "START:")
+		return false;
+
+	if( ! stringTimeToInt(in,beg))
+		return false;
+
+	//stop
+	if( !(in>>read) || read != "STOP:")
+		return false;
+
+	if( !stringTimeToInt(in, end))
+		return false;
+
+	range(beg, end);
+
+	return true;
+	}
+
+bool stringTimeToInt(std::istream& in, int& min)
+	{
+	int vh = -1;
+	int vm = -1;
+	std::string read;
+
+	if( in.bad() )
+		return false;
+
+	if( !( in>>vh ) || vh < 0 || 24 < vh )
+		return false;
+
+	if( !( in>>read ) || read != "h" )
+		return false;
+
+	if( !( in>>vm ) || vm < 0 || 59 < vm || (vh == 24 && vm !=0) )
+		return  false;
+
+	if( !(in>>read) || read != "min" )
+		return false;
+
+	min = vh*60 + vm;
+
+	return true;
+	}
+
+
+
+
+

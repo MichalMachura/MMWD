@@ -31,6 +31,8 @@ class GeneticAlgorithm
         std::vector<Chromosome*> current_best;
         std::ostream& output;
 
+		std::vector<double> goal_value_trace;
+
         unsigned int current_best_size;
         unsigned int current_population_size;
         unsigned int current_iteration = 0;
@@ -42,8 +44,8 @@ class GeneticAlgorithm
         static const unsigned int MIN_FOR_CROSSING = 60;
         static const unsigned int MAX_FOR_CROSSING = 95;
 
-        static const unsigned int MIN_POPULATION_SIZE = 7;  //minimum values
-        static const unsigned int MIN_ITERATION = 3;
+		static const unsigned int MIN_POPULATION_SIZE = 21;  //minimum values
+		static const unsigned int MIN_ITERATION = 5;
         static const unsigned int MIN_BEST = 2;
 
         unsigned int max_of_iteration;  //maximum values
@@ -79,6 +81,7 @@ class GeneticAlgorithm
         void setMaxPopulationSize(unsigned int max_population_size_);
         void setMaxBest(unsigned int max_best_);
         void setNumberOfRepeat(unsigned int num);
+		void setSettings(settings_list& list);
 
         //getters
         bool isEnd() const;
@@ -88,12 +91,16 @@ class GeneticAlgorithm
         unsigned int getPopulationSize() const;
         unsigned int getTheBestSize() const;
         unsigned int getNumOfRepeatTheBest() const;
-        settings_list setSettings() const;
+		settings_list getSettings() const;
+		const std::vector<double>& getValueTrace() const;
 
         //out
         friend std::ostream& operator<<(std::ostream& out, GeneticAlgorithm& obj);
         std::ostream& status(std::ostream&);
         void savePopulation(std::ostream& out);
+		void saveSettings(std::ostream& out);
+		void saveBest(std::ostream& out);
+
 
         ~GeneticAlgorithm();
     };
@@ -102,6 +109,10 @@ std::ostream& operator<<(std::ostream& out, GeneticAlgorithm& obj);
 
 
 std::ostream& operator<<(std::ostream& out, settings_list& obj);
+
+bool loadSettings(std::istream& in, settings_list& settings);
+
+
 #endif // GENETICALGORITHM_HPP
 
 

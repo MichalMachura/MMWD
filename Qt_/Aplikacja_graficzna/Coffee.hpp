@@ -9,10 +9,10 @@
 #define COFFEE_HPP_
 
 #include "Action.hpp"
-//#include <algorithm>
 #include <cmath>
 #include <vector>
 #include<iomanip>
+#include<istream>
 
 class Coffee : public Action{
 private:
@@ -83,6 +83,9 @@ public:
 	// --- dividingByRange(...) ---
 	// 	Dla Coffee nic nie robi
 	Action* divideByRange(TimeRange &range);
+
+
+	static std::shared_ptr<Action> createFromStream(std::istream& in);
 
 	~Coffee(){}
 

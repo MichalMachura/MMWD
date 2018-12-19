@@ -5,23 +5,29 @@ class Action;
 class DayActions;
 class GoalFunction;
 
-#include "Chromosome.hpp"
-#include "Action.hpp"
-#include "TimeRange.hpp"
-#include "GoalFunction.hpp"
-#include "Factors.hpp"
+
 #include<stdio.h>
 #include<vector>
 #include<string>
-#include "generateRandom.hpp"
 #include<utility>
 #include<memory>
 #include <typeinfo>
 #include <sstream>
 #include <iostream>
 
+#include "Chromosome.hpp"
+#include "Action.hpp"
+#include "TimeRange.hpp"
+#include "GoalFunction.hpp"
+#include "Factors.hpp"
+#include "generateRandom.hpp"
+#include "Point.hpp"
+
+
 typedef void (*checkingFunction)(std::vector<Action*>*,DayActions*);
 typedef std::shared_ptr<const Action> shared_ptr_Action;
+typedef std::shared_ptr<Action> shared_Action;
+typedef std::pair<std::string, shared_Action (*)(std::istream&) > stringAndParseFunction;
 
 
 class DayActions : public Chromosome
@@ -48,12 +54,10 @@ class DayActions : public Chromosome
 
         void checkRestrictionsAndRetake();
         void deleteAllActionsAndGoalFunction();
-        void addRandomAction();
-        void deleteOverlapping();
-
+		void addRandomAction();
 
     public:
-        DayActions(std::shared_ptr<GoalFunction> goalFunction_, const std::vector<shared_ptr_Action>& cl_types, std::vector<checkingFunction> checkFun, const Factors& start_factors_);
+		DayActions(std::shared_ptr<GoalFunction> goalFunction_, const std::vector<shared_ptr_Action>& cl_types, std::vector<checkingFunction> checkFun, const Factors start_factors_);
         explicit DayActions(const DayActions& other);
 
         void setStartFactors(Factors st_factors = Factors(0,0));
@@ -65,9 +69,11 @@ class DayActions : public Chromosome
         void onlyUpdate();
         void setFlagModified();
         void removeFromRange(TimeRange&);
+		void addRandAction();//not checking restrictions
 
         DayActions* replacePart(const DayActions*, TimeRange&) const;
         TimeRange getMaxFreeTimeRange();
+		std::vector<Point> getActivityPoints() const;
 
         DayActions& operator=(const DayActions& other);
 
@@ -80,9 +86,13 @@ class DayActions : public Chromosome
 
         virtual DayActions* randomDayActions() const;//v
 
+		static std::shared_ptr<DayActions> createFromFile(std::istream& in, std::vector<stringAndParseFunction> parse_form_and_function, std::shared_ptr<GoalFunction> goalFunction_, const std::vector<shared_ptr_Action>& cl_types, std::vector<checkingFunction>& checkFun );
+
         virtual ~DayActions();
 };
 
 TimeRange findMaxFreeTimeRange(const std::vector<Action*>&, int, int);  //must be sorted and overlapping must be deleted
+
+std::vector< std::shared_ptr<DayActions>> loadFromFile(std::istream& in, std::vector<stringAndParseFunction> parse_form_and_function, std::shared_ptr<GoalFunction> goalFunction_, const std::vector<shared_ptr_Action>& cl_types, std::vector<checkingFunction> checkFun );
 
 #endif

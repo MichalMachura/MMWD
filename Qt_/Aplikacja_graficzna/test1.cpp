@@ -12,6 +12,8 @@
 #include "DayActions.hpp"
 #include "Chromosome.hpp"
 #include "dwiefunkcje.hpp"
+#include "Point.hpp"
+#include <fstream>
 
 using namespace std;
 
@@ -21,12 +23,14 @@ int main()
 
     try
         {
-        std::shared_ptr<Sleep> sleep = make_shared<Sleep>();
-        std::shared_ptr<Coffee> coffee =  make_shared<Coffee>();
-        TimeRange range;
-        Factors st_factors(0,0);
+        std::shared_ptr<Sleep> sleep = make_shared<Sleep>(90,270);
+        std::shared_ptr<Coffee> coffee =  make_shared<Coffee>(20*60,70);
+        Sleep* a1 =new Sleep(90,270);
+        Coffee* a2 = new Coffee(1200,90);
 
-        std::vector<shared_ptr_Action> vec;
+        TimeRange range;
+        Factors st_factors(100,-0.05);
+        vector<shared_ptr_Action> vec;
         vec.push_back(shared_ptr_Action(sleep));
         vec.push_back(shared_ptr_Action(coffee));
 
@@ -37,14 +41,16 @@ int main()
         std::shared_ptr<GoalFunction> gF = make_shared<CoffeeAndSleepGoalFunction>();
 
         DayActions ch(gF,vec,fun,st_factors);
+        ch.addAction(a1);
+        ch.addAction(a2);
 				ch.updateFactors();
         clock_t start_time, end_time;
 
         //(wyswietlanie ,chrom. , roznica, liczba powtorzen wyniku, max iter.,max. populacja, max liczba wybieranych najlepszych)
-        GeneticAlgorithm genAlg = GeneticAlgorithm(cout,&ch,0.1,15,100,300,15);
+        //GeneticAlgorithm genAlg = GeneticAlgorithm(cout,&ch,0.1,15,100,300,15);
 
         start_time = clock();
-        Chromosome* ans = genAlg.startAlgorithm(true,1);
+        /*Chromosome* ans = genAlg.startAlgorithm(true,1);
 
         while(abc != 'q')
             {
@@ -54,17 +60,53 @@ int main()
 
             cin>>abc;
             }
-
+*/
         end_time = clock();
 /*        cout<<genAlg<<endl<<endl;
         genAlg.status(cout);
         std::cout<<endl<<(*ans);*/
 
-				genAlg.savePopulation(cout);
+				//genAlg.savePopulation(cout);
 
+				Factors f(13,-90);
+				TimeRange tr(2,5);
+				Sleep s(tr);
+				Coffee c(tr,70);
+
+				DayActions da(gF,vec,fun,f);
+				da.addAction(&s);
+				da.addAction(&c);
+
+				std::fstream plik;
+
+				plik.open("plik.txt", std::ios::out);
+
+				plik<<da;
+				plik<<ch;
+
+				plik.close();
+
+				cin>>abc;
+
+				plik.open("plik.txt", std::ios::in);
+				std::vector<stringAndParseFunction> parse_form_and_function;
+
+				stringAndParseFunction p1("Coffee:", Coffee::createFromStream), p2("Sleep:", Sleep::createFromStream);
+
+				parse_form_and_function.push_back(p1);
+				parse_form_and_function.push_back(p2);
+
+				std::vector< std::shared_ptr<DayActions>> ptr = loadFromFile(plik,parse_form_and_function,gF,vec,fun );
+				if( ptr.size() != 0 )
+					for(auto x : ptr)
+						cout<<x->toString()<<"\n";
+				else
+					cout<<"bad\n";
+
+				plik.close();
         cout<<"Execution time : "<<end_time-start_time<<endl;
 
-        delete ans;
+        //delete ans;
         //start_time = clock();
         //genAlg.restart(&ch,0,10,1000,2000,3);
         //end_time = clock();

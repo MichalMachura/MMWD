@@ -10,25 +10,27 @@ Coffee::Coffee(){
 	TimeRange tmpBegEnd(1,1);
 	begin_end = tmpBegEnd;
 	coffee_quantity = 200;
-	Factors tmp_fac(0,1);
+	Factors tmp_fac(0,-1);
 	factors_after = tmp_fac;
-
+	factors_before = tmp_fac;
 };
 
 Coffee::Coffee(int  _begin, int _quanities){
 	TimeRange tmpBegEnd(_begin,_begin);
 	begin_end = tmpBegEnd;
 	setCoffeeQuantity(_quanities);
-	Factors tmp_fac(0,1);
+	Factors tmp_fac(0,-1);
 	factors_after = tmp_fac;
+	factors_before = tmp_fac;
 };
 
 Coffee::Coffee(TimeRange _anTimeRng, int _quanities){					// Czas rozpoczęcia picia kawy i zakończenia jest ten sam :)
 	TimeRange tmpBegEnd(_anTimeRng.getBegin(),_anTimeRng.getBegin());
 	begin_end = tmpBegEnd;
 	setCoffeeQuantity(_quanities);
-	Factors tmp_fac(0,1);
+	Factors tmp_fac(0,-1);
 	factors_after = tmp_fac;
+	factors_before = tmp_fac;
 };
 
 Coffee::Coffee(int _begin , int _quanities, Factors _factors_after){
@@ -36,13 +38,14 @@ Coffee::Coffee(int _begin , int _quanities, Factors _factors_after){
 	begin_end = tmpBegEnd;
 	setCoffeeQuantity(_quanities);
 	factors_after = _factors_after;
-
+	factors_before = factors_after;
 }
 
 Coffee::Coffee(Coffee& _coffeeToCopy){
 	coffee_quantity = _coffeeToCopy.coffee_quantity;
 	begin_end = _coffeeToCopy.begin_end;
 	factors_after = _coffeeToCopy.factors_after;
+	factors_before = _coffeeToCopy.factors_before;
 };
 
 
@@ -70,6 +73,14 @@ void Coffee::checkRestrictionAndRetake(std::vector<Action*>*collection, DayActio
 	for (unsigned int i = 0; i < collection->size(); i++){
 		Coffee* item = dynamic_cast<Coffee*>((*collection)[i]);
 		if(item){
+			if(item->coffee_quantity < MIN_PORTION)
+				{
+				delete (*collection)[i];
+				collection->erase(collection->begin()+i);
+				--i;
+				continue;
+				}
+
 			int coffeeToAdd = (item)->getCoffeeQuantity();
 			int rest_for_coffee_portion = MAX_TOTAL_PER_DAY - coffeeSum;    //ile może być jesze kawy tego dnia
 
@@ -102,9 +113,15 @@ void Coffee::factorsAfter(Action* previousAction, int current_total_coffee_quant
 	if (TimeBetween<0)
 		return;
 
-	double newY = std::min(previousFactors.getY()-previousFactors.getA()*TimeBetween + y_modifier, Factors::MAX_Y);
+	double previous_y = previousFactors.getY() + previousFactors.getA()*TimeBetween;
+
+	if(previous_y < 0.0)
+		previous_y = 0.0;
+
+	double newY = std::min(previous_y + y_modifier, Factors::MAX_Y);
 	double newA = previousFactors.getA() * alpha_modifier;
 
+	factors_before = Factors(previous_y,previousFactors.getA());
 	factors_after = Factors(newY, newA);
 };
 
@@ -125,7 +142,7 @@ double Coffee::modificationAlpha(int coffeePortion_current, int coffeePortion_su
 
 string Coffee::toString() const{
 	std::stringstream text;
-    text<<"COFFEE:\t"<<Action::toString() <<"\tPortion:   "<<std::setw(4)<<coffee_quantity<<"ml\n";
+	text<<"Coffee:\n"<<Action::toString() <<"Portion:   "<<std::setw(4)<<coffee_quantity<<"ml\n";
 
 	return text.str();
 };
@@ -202,4 +219,24 @@ void Coffee::setMaxPerDay(int max)
     {
     MAX_TOTAL_PER_DAY = max;
     }
+
+
+std::shared_ptr<Action> Coffee::createFromStream(std::istream& in)
+	{
+	std::shared_ptr<Coffee> cof = nullptr;
+
+	TimeRange tr;
+	Factors factors;
+	int coffee = -2;
+	std::string read;
+
+	if( !Action::readFromFile(in,factors,tr) || !(in>>read) || read != "Portion:"
+		|| !(in>>coffee) || coffee < 0 || !(in>>read) || read != "ml" )
+		return cof;
+
+	cof = std::make_shared<Coffee>(tr.getBegin(),coffee);
+	cof->factors_after = factors;
+
+	return  cof;
+	}
 

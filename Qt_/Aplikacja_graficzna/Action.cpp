@@ -59,7 +59,7 @@ int Action::isEqual(const Action* otherAction) const{
 std::string Action::toString() const
     {
 	std::stringstream text;
-    text<<begin_end<<"\t"<<factors_after;
+	text<<begin_end<<"\n"<<factors_after;
 
 	return text.str();
     }
@@ -68,8 +68,38 @@ std::ostream& operator<<(std::ostream& out, const Action& obj)
     {
     out<<obj.toString();
 
-    return out;
-    }
+	return out;
+	}
+
+std::vector<Point> Action::getActivityDuring() const
+	{
+	std::vector<Point> vec;
+	vec.push_back( Point( begin_end.getBegin(), factors_before.getY() ) );
+	vec.push_back( Point( begin_end.getEnd(), factors_after.getY() ) );
+	return vec;
+	}
+
+
+bool Action::readFromFile(std::istream& in, Factors& st_factors, TimeRange& range)
+	{
+	TimeRange temp_range;
+	Factors temp_st_factors;
+
+	if( !(in>>temp_range) || !(in>>temp_st_factors) )
+		return false;
+
+	st_factors = temp_st_factors;
+	range = temp_range;
+
+	return  true;
+	}
+
+
+
+
+
+
+
 
 
 

@@ -9,6 +9,7 @@
 #define SLEEP_HPP_
 #include "Action.hpp"
 #include "DayActions.hpp"
+#include <istream>
 
 
 class Sleep :public Action{
@@ -72,6 +73,10 @@ public:
 	//		- a drugi, ten pozniejszy jest tworzony przez new i zwracany przez funkcje
 	//	jak range nie zawiera sie w Sleep zwraca: nullptr
 	Action* divideByRange(TimeRange& range);
+
+	std::vector<Point> getActivityDuring() const;
+
+	static std::shared_ptr<Action> createFromStream(std::istream& in);
 
 	~Sleep(){}
 };

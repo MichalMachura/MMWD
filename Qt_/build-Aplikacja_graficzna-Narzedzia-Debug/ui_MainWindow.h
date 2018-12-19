@@ -9,11 +9,12 @@
 #ifndef UI_MAINWINDOW_H
 #define UI_MAINWINDOW_H
 
+#include <MainWindow.hpp>
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QFormLayout>
-#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
@@ -44,10 +45,14 @@ public:
     QWidget *ekran1;
     QVBoxLayout *verticalLayout_11;
     QVBoxLayout *verticalLayout;
+    QTabWidget *tabWidget;
+    QWidget *tab_4;
+    QVBoxLayout *verticalLayout_20;
     QHBoxLayout *horizontalLayout_2;
     QWidget *ManipulacjaObiektemStartowym;
     QVBoxLayout *verticalLayout_14;
     QHBoxLayout *horizontalLayout_3;
+    QVBoxLayout *verticalLayout_17;
     QGroupBox *factors;
     QVBoxLayout *verticalLayout_13;
     QFormLayout *formLayout_3;
@@ -82,14 +87,16 @@ public:
     QLabel *label_7;
     QSpinBox *coffee_quantity;
     QPushButton *addCoffee;
+    QWidget *tab_3;
+    QVBoxLayout *verticalLayout_18;
+    QPushButton *addRandom;
     QHBoxLayout *horizontalLayout_4;
     QSpacerItem *horizontalSpacer_4;
-    QSpacerItem *horizontalSpacer_6;
-    QSpacerItem *horizontalSpacer_7;
-    QSpacerItem *horizontalSpacer_8;
-    QPushButton *check;
-    QSpacerItem *horizontalSpacer_5;
     QPushButton *removeAddedActions;
+    QSpacerItem *horizontalSpacer_5;
+    QPushButton *check;
+    QSpacerItem *horizontalSpacer_14;
+    QPushButton *addToList;
     QGroupBox *static_factors;
     QVBoxLayout *verticalLayout_6;
     QFormLayout *formLayout;
@@ -112,13 +119,32 @@ public:
     QSpinBox *min_tot_sleep;
     QLabel *label_20;
     QPushButton *set_static_factors;
+    QWidget *tab_5;
+    QVBoxLayout *verticalLayout_21;
+    QHBoxLayout *horizontalLayout_9;
+    QGridLayout *gridLayout_5;
+    QPushButton *loadStartObject;
+    QPushButton *loadStartPopulation;
+    QLabel *label_24;
+    QLineEdit *loadFile;
+    QPushButton *loadStaticParameters;
+    QGridLayout *gridLayout_3;
+    QLabel *label_26;
+    QPushButton *saveStartPopulation;
+    QPushButton *saveStartObject;
+    QPushButton *saveStaticParameters;
+    QLineEdit *saveFile;
+    QHBoxLayout *horizontalLayout_8;
     QScrollArea *WyswietlanieDayActions;
     QWidget *scrollAreaWidgetContents;
     QVBoxLayout *verticalLayout_3;
     QGroupBox *groupBox;
     QVBoxLayout *verticalLayout_8;
-    QGraphicsView *graphicsView;
+    View *plotDayAction;
     QTextBrowser *textBrowser;
+    QScrollArea *scrollArea_2;
+    QWidget *layout_populacji_startowej;
+    QVBoxLayout *verticalLayout_19;
     QHBoxLayout *DolnePrzyciski;
     QSpacerItem *horizontalSpacer_2;
     QPushButton *quitVievport1;
@@ -139,6 +165,8 @@ public:
     QPushButton *saveBest;
     QPushButton *saveAlgorithmParameters;
     QPushButton *saveStatus;
+    QPushButton *saveGoalTrace;
+    QLabel *label_25;
     QFormLayout *formLayout_6;
     QLabel *label_12;
     QSpinBox *maxBest;
@@ -148,6 +176,11 @@ public:
     QSpinBox *maxPopulation;
     QLabel *label_21;
     QSpinBox *numberOfRepeat;
+    QLabel *label_22;
+    QLineEdit *loadParamAlgFile;
+    QPushButton *loadAlgSettings;
+    QLabel *label_23;
+    View *trace;
     QHBoxLayout *horizontalLayout_7;
     QPushButton *startButton;
     QPushButton *resetButton;
@@ -158,7 +191,7 @@ public:
     QVBoxLayout *verticalLayout_10;
     QGroupBox *the_best;
     QVBoxLayout *verticalLayout_16;
-    QGraphicsView *plotTheBest;
+    View *plotTheBest;
     QTextBrowser *stringTheBest;
     QScrollArea *lista_chromosomow;
     QWidget *layout_listy;
@@ -179,7 +212,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(1029, 629);
+        MainWindow->resize(1050, 743);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         verticalLayout_9 = new QVBoxLayout(centralWidget);
@@ -197,10 +230,18 @@ public:
         verticalLayout = new QVBoxLayout();
         verticalLayout->setSpacing(6);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        tabWidget = new QTabWidget(ekran1);
+        tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
+        tab_4 = new QWidget();
+        tab_4->setObjectName(QString::fromUtf8("tab_4"));
+        verticalLayout_20 = new QVBoxLayout(tab_4);
+        verticalLayout_20->setSpacing(6);
+        verticalLayout_20->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_20->setObjectName(QString::fromUtf8("verticalLayout_20"));
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setSpacing(6);
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-        ManipulacjaObiektemStartowym = new QWidget(ekran1);
+        ManipulacjaObiektemStartowym = new QWidget(tab_4);
         ManipulacjaObiektemStartowym->setObjectName(QString::fromUtf8("ManipulacjaObiektemStartowym"));
         verticalLayout_14 = new QVBoxLayout(ManipulacjaObiektemStartowym);
         verticalLayout_14->setSpacing(6);
@@ -209,6 +250,9 @@ public:
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setSpacing(6);
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        verticalLayout_17 = new QVBoxLayout();
+        verticalLayout_17->setSpacing(6);
+        verticalLayout_17->setObjectName(QString::fromUtf8("verticalLayout_17"));
         factors = new QGroupBox(ManipulacjaObiektemStartowym);
         factors->setObjectName(QString::fromUtf8("factors"));
         QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -247,7 +291,7 @@ public:
         startFactors_y->setSizePolicy(sizePolicy2);
         startFactors_y->setMinimumSize(QSize(90, 0));
         startFactors_y->setMaximum(100);
-        startFactors_y->setProperty("y_value", QVariant(5u));
+        startFactors_y->setValue(50);
 
         formLayout_3->setWidget(0, QFormLayout::FieldRole, startFactors_y);
 
@@ -265,7 +309,8 @@ public:
         sizePolicy2.setHeightForWidth(startFactors_a->sizePolicy().hasHeightForWidth());
         startFactors_a->setSizePolicy(sizePolicy2);
         startFactors_a->setMinimumSize(QSize(90, 0));
-        startFactors_a->setDecimals(5);
+        startFactors_a->setDecimals(4);
+        startFactors_a->setMinimum(0.100000000000000);
 
         formLayout_3->setWidget(1, QFormLayout::FieldRole, startFactors_a);
 
@@ -277,7 +322,10 @@ public:
 
         verticalLayout_13->addWidget(setStartFactors);
 
-        deletingRange = new QGroupBox(factors);
+
+        verticalLayout_17->addWidget(factors);
+
+        deletingRange = new QGroupBox(ManipulacjaObiektemStartowym);
         deletingRange->setObjectName(QString::fromUtf8("deletingRange"));
         verticalLayout_2 = new QVBoxLayout(deletingRange);
         verticalLayout_2->setSpacing(6);
@@ -329,10 +377,10 @@ public:
         verticalLayout_2->addWidget(deleteRange);
 
 
-        verticalLayout_13->addWidget(deletingRange);
+        verticalLayout_17->addWidget(deletingRange);
 
 
-        horizontalLayout_3->addWidget(factors);
+        horizontalLayout_3->addLayout(verticalLayout_17);
 
         verticalLayout_7 = new QVBoxLayout();
         verticalLayout_7->setSpacing(6);
@@ -384,6 +432,7 @@ public:
         sleepEnd->setSizePolicy(sizePolicy2);
         sleepEnd->setMinimumSize(QSize(90, 0));
         sleepEnd->setAlignment(Qt::AlignCenter);
+        sleepEnd->setTime(QTime(8, 0, 0));
 
         formLayout_4->setWidget(1, QFormLayout::FieldRole, sleepEnd);
 
@@ -424,6 +473,7 @@ public:
         sizePolicy4.setHeightForWidth(coffee_moment->sizePolicy().hasHeightForWidth());
         coffee_moment->setSizePolicy(sizePolicy4);
         coffee_moment->setMinimumSize(QSize(90, 0));
+        coffee_moment->setTime(QTime(12, 15, 0));
 
         formLayout_2->setWidget(0, QFormLayout::FieldRole, coffee_moment);
 
@@ -442,6 +492,7 @@ public:
         coffee_quantity->setSizePolicy(sizePolicy4);
         coffee_quantity->setMinimumSize(QSize(90, 0));
         coffee_quantity->setMaximum(1500);
+        coffee_quantity->setValue(60);
 
         formLayout_2->setWidget(1, QFormLayout::FieldRole, coffee_quantity);
 
@@ -454,6 +505,18 @@ public:
         verticalLayout_5->addWidget(addCoffee);
 
         actions->addTab(tab, QString());
+        tab_3 = new QWidget();
+        tab_3->setObjectName(QString::fromUtf8("tab_3"));
+        verticalLayout_18 = new QVBoxLayout(tab_3);
+        verticalLayout_18->setSpacing(6);
+        verticalLayout_18->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_18->setObjectName(QString::fromUtf8("verticalLayout_18"));
+        addRandom = new QPushButton(tab_3);
+        addRandom->setObjectName(QString::fromUtf8("addRandom"));
+
+        verticalLayout_18->addWidget(addRandom);
+
+        actions->addTab(tab_3, QString());
 
         verticalLayout_7->addWidget(actions);
 
@@ -470,31 +533,28 @@ public:
 
         horizontalLayout_4->addItem(horizontalSpacer_4);
 
-        horizontalSpacer_6 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        removeAddedActions = new QPushButton(ManipulacjaObiektemStartowym);
+        removeAddedActions->setObjectName(QString::fromUtf8("removeAddedActions"));
 
-        horizontalLayout_4->addItem(horizontalSpacer_6);
+        horizontalLayout_4->addWidget(removeAddedActions);
 
-        horizontalSpacer_7 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        horizontalLayout_4->addItem(horizontalSpacer_7);
-
-        horizontalSpacer_8 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        horizontalLayout_4->addItem(horizontalSpacer_8);
+        horizontalLayout_4->addItem(horizontalSpacer_5);
 
         check = new QPushButton(ManipulacjaObiektemStartowym);
         check->setObjectName(QString::fromUtf8("check"));
 
         horizontalLayout_4->addWidget(check);
 
-        horizontalSpacer_5 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer_14 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        horizontalLayout_4->addItem(horizontalSpacer_5);
+        horizontalLayout_4->addItem(horizontalSpacer_14);
 
-        removeAddedActions = new QPushButton(ManipulacjaObiektemStartowym);
-        removeAddedActions->setObjectName(QString::fromUtf8("removeAddedActions"));
+        addToList = new QPushButton(ManipulacjaObiektemStartowym);
+        addToList->setObjectName(QString::fromUtf8("addToList"));
 
-        horizontalLayout_4->addWidget(removeAddedActions);
+        horizontalLayout_4->addWidget(addToList);
 
 
         verticalLayout_14->addLayout(horizontalLayout_4);
@@ -502,12 +562,13 @@ public:
 
         horizontalLayout_2->addWidget(ManipulacjaObiektemStartowym);
 
-        static_factors = new QGroupBox(ekran1);
+        static_factors = new QGroupBox(tab_4);
         static_factors->setObjectName(QString::fromUtf8("static_factors"));
         static_factors->setEnabled(true);
         sizePolicy.setHeightForWidth(static_factors->sizePolicy().hasHeightForWidth());
         static_factors->setSizePolicy(sizePolicy);
         static_factors->setMinimumSize(QSize(250, 0));
+        static_factors->setAlignment(Qt::AlignCenter);
         verticalLayout_6 = new QVBoxLayout(static_factors);
         verticalLayout_6->setSpacing(6);
         verticalLayout_6->setContentsMargins(11, 11, 11, 11);
@@ -538,6 +599,7 @@ public:
         min_coffee->setAlignment(Qt::AlignCenter);
         min_coffee->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
         min_coffee->setMaximum(1500);
+        min_coffee->setSingleStep(10);
         min_coffee->setValue(60);
 
         formLayout->setWidget(0, QFormLayout::FieldRole, min_coffee);
@@ -581,6 +643,7 @@ public:
         sizePolicy5.setHeightForWidth(max_coffee->sizePolicy().hasHeightForWidth());
         max_coffee->setSizePolicy(sizePolicy5);
         max_coffee->setMaximum(12000);
+        max_coffee->setSingleStep(50);
         max_coffee->setValue(1500);
 
         formLayout->setWidget(1, QFormLayout::FieldRole, max_coffee);
@@ -589,9 +652,9 @@ public:
         y_coffee_mod->setObjectName(QString::fromUtf8("y_coffee_mod"));
         sizePolicy5.setHeightForWidth(y_coffee_mod->sizePolicy().hasHeightForWidth());
         y_coffee_mod->setSizePolicy(sizePolicy5);
-        y_coffee_mod->setDecimals(4);
-        y_coffee_mod->setMaximum(20.000000000000000);
-        y_coffee_mod->setSingleStep(0.010000000000000);
+        y_coffee_mod->setDecimals(1);
+        y_coffee_mod->setMaximum(10.000000000000000);
+        y_coffee_mod->setSingleStep(0.500000000000000);
         y_coffee_mod->setValue(1.000000000000000);
 
         formLayout->setWidget(3, QFormLayout::FieldRole, y_coffee_mod);
@@ -600,9 +663,10 @@ public:
         a_coffee_mod->setObjectName(QString::fromUtf8("a_coffee_mod"));
         sizePolicy5.setHeightForWidth(a_coffee_mod->sizePolicy().hasHeightForWidth());
         a_coffee_mod->setSizePolicy(sizePolicy5);
-        a_coffee_mod->setDecimals(4);
-        a_coffee_mod->setMaximum(20.000000000000000);
-        a_coffee_mod->setSingleStep(0.001000000000000);
+        a_coffee_mod->setDecimals(2);
+        a_coffee_mod->setMinimum(0.200000000000000);
+        a_coffee_mod->setMaximum(1.000000000000000);
+        a_coffee_mod->setSingleStep(0.100000000000000);
         a_coffee_mod->setValue(1.000000000000000);
 
         formLayout->setWidget(4, QFormLayout::FieldRole, a_coffee_mod);
@@ -611,10 +675,10 @@ public:
         a_sleep_mod->setObjectName(QString::fromUtf8("a_sleep_mod"));
         sizePolicy5.setHeightForWidth(a_sleep_mod->sizePolicy().hasHeightForWidth());
         a_sleep_mod->setSizePolicy(sizePolicy5);
-        a_sleep_mod->setDecimals(4);
-        a_sleep_mod->setMinimum(0.000000000000000);
-        a_sleep_mod->setMaximum(20.000000000000000);
-        a_sleep_mod->setSingleStep(0.010000000000000);
+        a_sleep_mod->setDecimals(1);
+        a_sleep_mod->setMinimum(0.500000000000000);
+        a_sleep_mod->setMaximum(5.000000000000000);
+        a_sleep_mod->setSingleStep(0.100000000000000);
         a_sleep_mod->setValue(3.000000000000000);
 
         formLayout->setWidget(5, QFormLayout::FieldRole, a_sleep_mod);
@@ -679,6 +743,9 @@ public:
 
         set_static_factors = new QPushButton(static_factors);
         set_static_factors->setObjectName(QString::fromUtf8("set_static_factors"));
+        sizePolicy5.setHeightForWidth(set_static_factors->sizePolicy().hasHeightForWidth());
+        set_static_factors->setSizePolicy(sizePolicy5);
+        set_static_factors->setCheckable(false);
 
         verticalLayout_6->addWidget(set_static_factors);
 
@@ -686,14 +753,129 @@ public:
         horizontalLayout_2->addWidget(static_factors);
 
 
-        verticalLayout->addLayout(horizontalLayout_2);
+        verticalLayout_20->addLayout(horizontalLayout_2);
 
+        tabWidget->addTab(tab_4, QString());
+        tab_5 = new QWidget();
+        tab_5->setObjectName(QString::fromUtf8("tab_5"));
+        verticalLayout_21 = new QVBoxLayout(tab_5);
+        verticalLayout_21->setSpacing(6);
+        verticalLayout_21->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_21->setObjectName(QString::fromUtf8("verticalLayout_21"));
+        horizontalLayout_9 = new QHBoxLayout();
+        horizontalLayout_9->setSpacing(6);
+        horizontalLayout_9->setObjectName(QString::fromUtf8("horizontalLayout_9"));
+        gridLayout_5 = new QGridLayout();
+        gridLayout_5->setSpacing(6);
+        gridLayout_5->setObjectName(QString::fromUtf8("gridLayout_5"));
+        loadStartObject = new QPushButton(tab_5);
+        loadStartObject->setObjectName(QString::fromUtf8("loadStartObject"));
+        sizePolicy2.setHeightForWidth(loadStartObject->sizePolicy().hasHeightForWidth());
+        loadStartObject->setSizePolicy(sizePolicy2);
+        loadStartObject->setMinimumSize(QSize(150, 0));
+
+        gridLayout_5->addWidget(loadStartObject, 1, 0, 1, 1);
+
+        loadStartPopulation = new QPushButton(tab_5);
+        loadStartPopulation->setObjectName(QString::fromUtf8("loadStartPopulation"));
+        sizePolicy2.setHeightForWidth(loadStartPopulation->sizePolicy().hasHeightForWidth());
+        loadStartPopulation->setSizePolicy(sizePolicy2);
+        loadStartPopulation->setMinimumSize(QSize(150, 0));
+
+        gridLayout_5->addWidget(loadStartPopulation, 1, 1, 1, 1);
+
+        label_24 = new QLabel(tab_5);
+        label_24->setObjectName(QString::fromUtf8("label_24"));
+        sizePolicy1.setHeightForWidth(label_24->sizePolicy().hasHeightForWidth());
+        label_24->setSizePolicy(sizePolicy1);
+        label_24->setMinimumSize(QSize(150, 0));
+        label_24->setAlignment(Qt::AlignCenter);
+
+        gridLayout_5->addWidget(label_24, 0, 0, 1, 1);
+
+        loadFile = new QLineEdit(tab_5);
+        loadFile->setObjectName(QString::fromUtf8("loadFile"));
+        sizePolicy2.setHeightForWidth(loadFile->sizePolicy().hasHeightForWidth());
+        loadFile->setSizePolicy(sizePolicy2);
+        loadFile->setMinimumSize(QSize(150, 0));
+        loadFile->setAlignment(Qt::AlignCenter);
+
+        gridLayout_5->addWidget(loadFile, 0, 1, 1, 1);
+
+        loadStaticParameters = new QPushButton(tab_5);
+        loadStaticParameters->setObjectName(QString::fromUtf8("loadStaticParameters"));
+        sizePolicy2.setHeightForWidth(loadStaticParameters->sizePolicy().hasHeightForWidth());
+        loadStaticParameters->setSizePolicy(sizePolicy2);
+        loadStaticParameters->setMinimumSize(QSize(150, 0));
+
+        gridLayout_5->addWidget(loadStaticParameters, 2, 1, 1, 1);
+
+
+        horizontalLayout_9->addLayout(gridLayout_5);
+
+        gridLayout_3 = new QGridLayout();
+        gridLayout_3->setSpacing(6);
+        gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
+        label_26 = new QLabel(tab_5);
+        label_26->setObjectName(QString::fromUtf8("label_26"));
+        sizePolicy2.setHeightForWidth(label_26->sizePolicy().hasHeightForWidth());
+        label_26->setSizePolicy(sizePolicy2);
+        label_26->setMinimumSize(QSize(150, 0));
+        label_26->setAlignment(Qt::AlignCenter);
+
+        gridLayout_3->addWidget(label_26, 0, 0, 1, 1);
+
+        saveStartPopulation = new QPushButton(tab_5);
+        saveStartPopulation->setObjectName(QString::fromUtf8("saveStartPopulation"));
+        sizePolicy2.setHeightForWidth(saveStartPopulation->sizePolicy().hasHeightForWidth());
+        saveStartPopulation->setSizePolicy(sizePolicy2);
+        saveStartPopulation->setMinimumSize(QSize(150, 0));
+
+        gridLayout_3->addWidget(saveStartPopulation, 1, 1, 1, 1);
+
+        saveStartObject = new QPushButton(tab_5);
+        saveStartObject->setObjectName(QString::fromUtf8("saveStartObject"));
+        sizePolicy2.setHeightForWidth(saveStartObject->sizePolicy().hasHeightForWidth());
+        saveStartObject->setSizePolicy(sizePolicy2);
+        saveStartObject->setMinimumSize(QSize(150, 0));
+
+        gridLayout_3->addWidget(saveStartObject, 1, 0, 1, 1);
+
+        saveStaticParameters = new QPushButton(tab_5);
+        saveStaticParameters->setObjectName(QString::fromUtf8("saveStaticParameters"));
+        sizePolicy2.setHeightForWidth(saveStaticParameters->sizePolicy().hasHeightForWidth());
+        saveStaticParameters->setSizePolicy(sizePolicy2);
+        saveStaticParameters->setMinimumSize(QSize(150, 0));
+
+        gridLayout_3->addWidget(saveStaticParameters, 2, 1, 1, 1);
+
+        saveFile = new QLineEdit(tab_5);
+        saveFile->setObjectName(QString::fromUtf8("saveFile"));
+        sizePolicy2.setHeightForWidth(saveFile->sizePolicy().hasHeightForWidth());
+        saveFile->setSizePolicy(sizePolicy2);
+        saveFile->setMinimumSize(QSize(150, 0));
+
+        gridLayout_3->addWidget(saveFile, 0, 1, 1, 1);
+
+
+        horizontalLayout_9->addLayout(gridLayout_3);
+
+
+        verticalLayout_21->addLayout(horizontalLayout_9);
+
+        tabWidget->addTab(tab_5, QString());
+
+        verticalLayout->addWidget(tabWidget);
+
+        horizontalLayout_8 = new QHBoxLayout();
+        horizontalLayout_8->setSpacing(6);
+        horizontalLayout_8->setObjectName(QString::fromUtf8("horizontalLayout_8"));
         WyswietlanieDayActions = new QScrollArea(ekran1);
         WyswietlanieDayActions->setObjectName(QString::fromUtf8("WyswietlanieDayActions"));
         WyswietlanieDayActions->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 972, 357));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 156, 357));
         verticalLayout_3 = new QVBoxLayout(scrollAreaWidgetContents);
         verticalLayout_3->setSpacing(6);
         verticalLayout_3->setContentsMargins(11, 11, 11, 11);
@@ -709,17 +891,16 @@ public:
         verticalLayout_8->setSpacing(6);
         verticalLayout_8->setContentsMargins(11, 11, 11, 11);
         verticalLayout_8->setObjectName(QString::fromUtf8("verticalLayout_8"));
-        graphicsView = new QGraphicsView(groupBox);
-        graphicsView->setObjectName(QString::fromUtf8("graphicsView"));
+        plotDayAction = new View(groupBox);
+        plotDayAction->setObjectName(QString::fromUtf8("plotDayAction"));
         QSizePolicy sizePolicy7(QSizePolicy::Expanding, QSizePolicy::Fixed);
         sizePolicy7.setHorizontalStretch(0);
         sizePolicy7.setVerticalStretch(0);
-        sizePolicy7.setHeightForWidth(graphicsView->sizePolicy().hasHeightForWidth());
-        graphicsView->setSizePolicy(sizePolicy7);
-        graphicsView->setMinimumSize(QSize(0, 150));
-        graphicsView->setProperty("y_value", QVariant(0u));
+        sizePolicy7.setHeightForWidth(plotDayAction->sizePolicy().hasHeightForWidth());
+        plotDayAction->setSizePolicy(sizePolicy7);
+        plotDayAction->setMinimumSize(QSize(0, 150));
 
-        verticalLayout_8->addWidget(graphicsView);
+        verticalLayout_8->addWidget(plotDayAction);
 
         textBrowser = new QTextBrowser(groupBox);
         textBrowser->setObjectName(QString::fromUtf8("textBrowser"));
@@ -735,7 +916,24 @@ public:
 
         WyswietlanieDayActions->setWidget(scrollAreaWidgetContents);
 
-        verticalLayout->addWidget(WyswietlanieDayActions);
+        horizontalLayout_8->addWidget(WyswietlanieDayActions);
+
+        scrollArea_2 = new QScrollArea(ekran1);
+        scrollArea_2->setObjectName(QString::fromUtf8("scrollArea_2"));
+        scrollArea_2->setWidgetResizable(true);
+        layout_populacji_startowej = new QWidget();
+        layout_populacji_startowej->setObjectName(QString::fromUtf8("layout_populacji_startowej"));
+        layout_populacji_startowej->setGeometry(QRect(0, 0, 98, 28));
+        verticalLayout_19 = new QVBoxLayout(layout_populacji_startowej);
+        verticalLayout_19->setSpacing(6);
+        verticalLayout_19->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_19->setObjectName(QString::fromUtf8("verticalLayout_19"));
+        scrollArea_2->setWidget(layout_populacji_startowej);
+
+        horizontalLayout_8->addWidget(scrollArea_2);
+
+
+        verticalLayout->addLayout(horizontalLayout_8);
 
         DolnePrzyciski = new QHBoxLayout();
         DolnePrzyciski->setSpacing(6);
@@ -804,7 +1002,7 @@ public:
         minDiff->setAlignment(Qt::AlignCenter);
         minDiff->setDecimals(4);
         minDiff->setSingleStep(0.010000000000000);
-        minDiff->setValue(1.000000000000000);
+        minDiff->setValue(0.000100000000000);
 
         formLayout_7->setWidget(0, QFormLayout::FieldRole, minDiff);
 
@@ -826,6 +1024,8 @@ public:
         maxIter->setAlignment(Qt::AlignCenter);
         maxIter->setMinimum(20);
         maxIter->setMaximum(3000);
+        maxIter->setSingleStep(10);
+        maxIter->setValue(100);
 
         formLayout_7->setWidget(1, QFormLayout::FieldRole, maxIter);
 
@@ -886,6 +1086,22 @@ public:
 
         formLayout_7->setWidget(4, QFormLayout::FieldRole, saveStatus);
 
+        saveGoalTrace = new QPushButton(ekran2);
+        saveGoalTrace->setObjectName(QString::fromUtf8("saveGoalTrace"));
+        sizePolicy2.setHeightForWidth(saveGoalTrace->sizePolicy().hasHeightForWidth());
+        saveGoalTrace->setSizePolicy(sizePolicy2);
+        saveGoalTrace->setMinimumSize(QSize(150, 0));
+
+        formLayout_7->setWidget(5, QFormLayout::FieldRole, saveGoalTrace);
+
+        label_25 = new QLabel(ekran2);
+        label_25->setObjectName(QString::fromUtf8("label_25"));
+        sizePolicy1.setHeightForWidth(label_25->sizePolicy().hasHeightForWidth());
+        label_25->setSizePolicy(sizePolicy1);
+        label_25->setMinimumSize(QSize(150, 0));
+
+        formLayout_7->setWidget(5, QFormLayout::LabelRole, label_25);
+
 
         horizontalLayout_6->addLayout(formLayout_7);
 
@@ -916,7 +1132,7 @@ public:
         maxBest->setAlignment(Qt::AlignCenter);
         maxBest->setMinimum(2);
         maxBest->setMaximum(20);
-        maxBest->setValue(3);
+        maxBest->setValue(10);
 
         formLayout_6->setWidget(0, QFormLayout::FieldRole, maxBest);
 
@@ -963,8 +1179,10 @@ public:
         maxPopulation->setLayoutDirection(Qt::LeftToRight);
         maxPopulation->setWrapping(false);
         maxPopulation->setAlignment(Qt::AlignCenter);
-        maxPopulation->setMinimum(20);
+        maxPopulation->setMinimum(21);
         maxPopulation->setMaximum(3000);
+        maxPopulation->setSingleStep(5);
+        maxPopulation->setValue(200);
 
         formLayout_6->setWidget(2, QFormLayout::FieldRole, maxPopulation);
 
@@ -992,12 +1210,53 @@ public:
         numberOfRepeat->setSizePolicy(sizePolicy9);
         numberOfRepeat->setMinimumSize(QSize(150, 0));
         numberOfRepeat->setAlignment(Qt::AlignCenter);
-        numberOfRepeat->setValue(1);
+        numberOfRepeat->setValue(2);
 
         formLayout_6->setWidget(3, QFormLayout::FieldRole, numberOfRepeat);
 
+        label_22 = new QLabel(ekran2);
+        label_22->setObjectName(QString::fromUtf8("label_22"));
+        sizePolicy1.setHeightForWidth(label_22->sizePolicy().hasHeightForWidth());
+        label_22->setSizePolicy(sizePolicy1);
+        label_22->setMinimumSize(QSize(150, 0));
+        label_22->setAlignment(Qt::AlignCenter);
+
+        formLayout_6->setWidget(4, QFormLayout::LabelRole, label_22);
+
+        loadParamAlgFile = new QLineEdit(ekran2);
+        loadParamAlgFile->setObjectName(QString::fromUtf8("loadParamAlgFile"));
+        sizePolicy2.setHeightForWidth(loadParamAlgFile->sizePolicy().hasHeightForWidth());
+        loadParamAlgFile->setSizePolicy(sizePolicy2);
+        loadParamAlgFile->setMinimumSize(QSize(150, 0));
+
+        formLayout_6->setWidget(4, QFormLayout::FieldRole, loadParamAlgFile);
+
+        loadAlgSettings = new QPushButton(ekran2);
+        loadAlgSettings->setObjectName(QString::fromUtf8("loadAlgSettings"));
+        sizePolicy9.setHeightForWidth(loadAlgSettings->sizePolicy().hasHeightForWidth());
+        loadAlgSettings->setSizePolicy(sizePolicy9);
+        loadAlgSettings->setMinimumSize(QSize(150, 0));
+        loadAlgSettings->setMaximumSize(QSize(150, 16777215));
+        loadAlgSettings->setCheckable(false);
+        loadAlgSettings->setAutoExclusive(false);
+
+        formLayout_6->setWidget(5, QFormLayout::FieldRole, loadAlgSettings);
+
+        label_23 = new QLabel(ekran2);
+        label_23->setObjectName(QString::fromUtf8("label_23"));
+        sizePolicy1.setHeightForWidth(label_23->sizePolicy().hasHeightForWidth());
+        label_23->setSizePolicy(sizePolicy1);
+        label_23->setMinimumSize(QSize(150, 0));
+
+        formLayout_6->setWidget(5, QFormLayout::LabelRole, label_23);
+
 
         horizontalLayout_6->addLayout(formLayout_6);
+
+        trace = new View(ekran2);
+        trace->setObjectName(QString::fromUtf8("trace"));
+
+        horizontalLayout_6->addWidget(trace);
 
 
         verticalLayout_12->addLayout(horizontalLayout_6);
@@ -1035,7 +1294,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents_2 = new QWidget();
         scrollAreaWidgetContents_2->setObjectName(QString::fromUtf8("scrollAreaWidgetContents_2"));
-        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 474, 441));
+        scrollAreaWidgetContents_2->setGeometry(QRect(0, 0, 484, 449));
         verticalLayout_10 = new QVBoxLayout(scrollAreaWidgetContents_2);
         verticalLayout_10->setSpacing(6);
         verticalLayout_10->setContentsMargins(11, 11, 11, 11);
@@ -1051,7 +1310,7 @@ public:
         verticalLayout_16->setSpacing(6);
         verticalLayout_16->setContentsMargins(11, 11, 11, 11);
         verticalLayout_16->setObjectName(QString::fromUtf8("verticalLayout_16"));
-        plotTheBest = new QGraphicsView(the_best);
+        plotTheBest = new View(the_best);
         plotTheBest->setObjectName(QString::fromUtf8("plotTheBest"));
         sizePolicy7.setHeightForWidth(plotTheBest->sizePolicy().hasHeightForWidth());
         plotTheBest->setSizePolicy(sizePolicy7);
@@ -1066,7 +1325,7 @@ public:
         sizePolicy11.setVerticalStretch(0);
         sizePolicy11.setHeightForWidth(stringTheBest->sizePolicy().hasHeightForWidth());
         stringTheBest->setSizePolicy(sizePolicy11);
-        stringTheBest->setMinimumSize(QSize(0, 150));
+        stringTheBest->setMinimumSize(QSize(0, 200));
 
         verticalLayout_16->addWidget(stringTheBest);
 
@@ -1082,7 +1341,7 @@ public:
         lista_chromosomow->setWidgetResizable(true);
         layout_listy = new QWidget();
         layout_listy->setObjectName(QString::fromUtf8("layout_listy"));
-        layout_listy->setGeometry(QRect(0, 0, 490, 328));
+        layout_listy->setGeometry(QRect(0, 0, 501, 310));
         verticalLayout_15 = new QVBoxLayout(layout_listy);
         verticalLayout_15->setSpacing(6);
         verticalLayout_15->setContentsMargins(11, 11, 11, 11);
@@ -1137,7 +1396,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1029, 21));
+        menuBar->setGeometry(QRect(0, 0, 1050, 21));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QString::fromUtf8("mainToolBar"));
@@ -1153,8 +1412,10 @@ public:
         QObject::connect(quitVievport1, SIGNAL(clicked()), MainWindow, SLOT(close()));
         QObject::connect(quitButton, SIGNAL(clicked()), MainWindow, SLOT(close()));
 
-        zmianaOkna->setCurrentIndex(0);
-        actions->setCurrentIndex(1);
+        zmianaOkna->setCurrentIndex(1);
+        tabWidget->setCurrentIndex(1);
+        actions->setCurrentIndex(2);
+        loadAlgSettings->setDefault(false);
         continueButton->setDefault(false);
 
 
@@ -1180,8 +1441,11 @@ public:
         label_7->setText(QApplication::translate("MainWindow", "Ilo\305\233\304\207 kawy:", nullptr));
         addCoffee->setText(QApplication::translate("MainWindow", "Dodaj Kaw\304\231", nullptr));
         actions->setTabText(actions->indexOf(tab), QApplication::translate("MainWindow", "Kawa", nullptr));
-        check->setText(QApplication::translate("MainWindow", "Sprwad\305\272 ograniczenia i popraw", nullptr));
+        addRandom->setText(QApplication::translate("MainWindow", "Dodaj Losow\304\205 Czynno\305\233\304\207", nullptr));
+        actions->setTabText(actions->indexOf(tab_3), QApplication::translate("MainWindow", "Losowa czynno\305\233\304\207", nullptr));
         removeAddedActions->setText(QApplication::translate("MainWindow", "Usu\305\204 dodane czynno\305\233ci", nullptr));
+        check->setText(QApplication::translate("MainWindow", "Sprwad\305\272 ograniczenia i popraw", nullptr));
+        addToList->setText(QApplication::translate("MainWindow", "Dodaj do listy", nullptr));
         static_factors->setTitle(QApplication::translate("MainWindow", "Wsp\303\263\305\202czynniki Statyczne:", nullptr));
         label->setText(QApplication::translate("MainWindow", "Minimalna Porcja Kawy:", nullptr));
         label_15->setText(QApplication::translate("MainWindow", "Max. ilo\305\233\304\207 kawy / dzie\305\204:", nullptr));
@@ -1193,6 +1457,16 @@ public:
         label_18->setText(QApplication::translate("MainWindow", "Wp\305\202yw ilo\305\233ci spo\305\274ytej kawy na funkcj\304\231 celu:", nullptr));
         label_20->setText(QApplication::translate("MainWindow", "Min. czas sumarycznego snu", nullptr));
         set_static_factors->setText(QApplication::translate("MainWindow", "Ustaw Wsp\303\263\305\202czynnki", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_4), QApplication::translate("MainWindow", "Obiekty pocz\304\205tkowe", nullptr));
+        loadStartObject->setText(QApplication::translate("MainWindow", "Za\305\202aduj Obiekt Startowy", nullptr));
+        loadStartPopulation->setText(QApplication::translate("MainWindow", "Za\305\202aduj Populacj\304\231 Startow\304\205", nullptr));
+        label_24->setText(QApplication::translate("MainWindow", "Plik do odczytu:", nullptr));
+        loadStaticParameters->setText(QApplication::translate("MainWindow", "Za\305\202aduj Parametry Statyczne", nullptr));
+        label_26->setText(QApplication::translate("MainWindow", "Plik do zapisu:", nullptr));
+        saveStartPopulation->setText(QApplication::translate("MainWindow", "Zapisz Populacj\304\231 Startow\304\205", nullptr));
+        saveStartObject->setText(QApplication::translate("MainWindow", "Zapisz Obiekt Startowy", nullptr));
+        saveStaticParameters->setText(QApplication::translate("MainWindow", "Zapisz Parametry Statyczne", nullptr));
+        tabWidget->setTabText(tabWidget->indexOf(tab_5), QApplication::translate("MainWindow", "Za\305\202aduj z pliku", nullptr));
         groupBox->setTitle(QApplication::translate("MainWindow", "Podgl\304\205d Ci\304\205gu Czynno\305\233ci", nullptr));
         quitVievport1->setText(QApplication::translate("MainWindow", "Quit", nullptr));
         toAlgorithm->setText(QApplication::translate("MainWindow", "Do Algorytmu", nullptr));
@@ -1203,10 +1477,15 @@ public:
         saveBest->setText(QApplication::translate("MainWindow", "ZAPISZ BIE\305\273\304\204CY NAJLEPSZY WYNIK", nullptr));
         saveAlgorithmParameters->setText(QApplication::translate("MainWindow", "ZAPISZ PARAMETRY ALGORYTMU", nullptr));
         saveStatus->setText(QApplication::translate("MainWindow", "ZAPISZ STATUS", nullptr));
+        saveGoalTrace->setText(QApplication::translate("MainWindow", "ZAPISZ PRZEBIEG FUNKCJI CELU", nullptr));
+        label_25->setText(QString());
         label_12->setText(QApplication::translate("MainWindow", "Max. ilo\305\233\304\207 wybieranych najlepzych osobnik\303\263w", nullptr));
         label_11->setText(QApplication::translate("MainWindow", "ilo\305\233\304\207 pokole\305\204 do przerwania:", nullptr));
         label_19->setText(QApplication::translate("MainWindow", "Max. polpulacji:", nullptr));
         label_21->setText(QApplication::translate("MainWindow", "Liczba powt\303\263rze\305\204 najlepszego osobnika", nullptr));
+        label_22->setText(QApplication::translate("MainWindow", "Plik do odczytu:", nullptr));
+        loadAlgSettings->setText(QApplication::translate("MainWindow", "ZA\305\201ADUJ USTAWIENIA", nullptr));
+        label_23->setText(QString());
         startButton->setText(QApplication::translate("MainWindow", "START", nullptr));
         resetButton->setText(QApplication::translate("MainWindow", "RESET", nullptr));
         continueButton->setText(QApplication::translate("MainWindow", "KONTYNUJ", nullptr));

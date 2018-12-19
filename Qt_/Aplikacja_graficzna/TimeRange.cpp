@@ -105,10 +105,12 @@ std::string minToString (int mins){
 	int h = minAndHours[1];
 	int m = minAndHours[0];
 	std::stringstream text;
+
 	text.width(2);
-	//text.fill(' ');
+	text.fill(' ');
 	text<<h<<"h ";
     text.width(2);
+	text.fill(' ');
 	text<<m<<"min";
 	return text.str();
 };

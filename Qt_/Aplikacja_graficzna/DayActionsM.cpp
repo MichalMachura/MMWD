@@ -57,51 +57,7 @@ void DayActions::sort() //setting and removing flags
     //deleteOverlapping();
     }
 
-void DayActions::deleteOverlapping()
-    {
-    if(collection.empty())
-        return;
 
-    bool ans = false;
-    for(unsigned int z = 0; z < collection.size(); ++z)
-        {
-        for(int i = 0; i < int(collection.size())-1; ++i)
-            if(collection[i]->isEqual(collection[i+1]) == 0)
-                {
-                if(collection[i]->getBegin() >= collection[i+1]->getBegin() && collection[i]->getEnd() <= collection[i+1]->getEnd())
-                    {//i is contained in i+1
-                    delete collection[i];
-                    collection[i] = nullptr;
-                    collection.erase(collection.begin()+ i);
-                    --i;
-                    ans = true;
-                    }
-                else if(collection[i]->getBegin() <= collection[i+1]->getBegin() && collection[i]->getEnd() >= collection[i+1]->getEnd())
-                    {//i+1 is contained in i
-                    delete collection[i+1];
-                    collection[i+1] = nullptr;
-                    collection.erase(collection.begin()+ i+1);
-                    ans = true;
-                    }
-                else if(collection[i]->getBegin() >= collection[i+1]->getBegin())//only overlapping
-                    {
-                    Action* temporary = collection[i];
-                    collection[i] = collection[i+1];
-                    collection[i+1] = temporary;
-                    ans = true;
-                    }
-                }
-
-        if(ans)
-            {
-            modified = true;        //setting and removing flags
-            ans = false;
-            continue;
-            }
-        else
-            break;
-        }
-    }
 
 DayActions* DayActions::replacePart(const DayActions* other, TimeRange& range) const
     {
@@ -393,6 +349,9 @@ Chromosome* DayActions::randomChromosome() const
 
 void DayActions::updateFactors()   //setting flag
     {
+	if(start_factors.getA() > -0.1)
+		start_factors.setA(-0.1);
+
     if(modified)        //if some modifications
         checkRestrictionsAndRetake();
 
@@ -456,7 +415,7 @@ DayActions::~DayActions()
     deleteAllActionsAndGoalFunction();
     }
 
-DayActions::DayActions(std::shared_ptr<GoalFunction> goalFunction_, const std::vector<shared_ptr_Action>& cl_types, std::vector<checkingFunction> checkFun, const Factors& start_factors_) : start_factors(start_factors_)
+DayActions::DayActions(std::shared_ptr<GoalFunction> goalFunction_, const std::vector<shared_ptr_Action>& cl_types, std::vector<checkingFunction> checkFun, const Factors start_factors_) : start_factors(start_factors_)
     {
     if(cl_types.empty())
         throw std::string("\ncl_types is empty\n");
@@ -470,7 +429,7 @@ DayActions::DayActions(std::shared_ptr<GoalFunction> goalFunction_, const std::v
 
     //class_types_and_check_functions = cl_types_checkFun;
     for(shared_ptr_Action x : cl_types)
-        class_types.push_back(x);
+		class_types.push_back(x);
 
     check_functions = checkFun;
 
@@ -509,8 +468,8 @@ DayActions::DayActions(const DayActions& other)
 
 DayActions* DayActions::randomDayActions() const
     {
-    Factors random_start(generateRandom(0,100),generateRandom(-10000,0)/1000.0); //random start_factors
-    DayActions* answer = new DayActions(this->goal_function, this->class_types, this->check_functions,random_start);    //returned object
+	Factors random_start(generateRandom(0,100),generateRandom(-10000,-100)/1000.0); //random start_factors
+	DayActions* answer = new DayActions(this->goal_function, this->class_types, this->check_functions,random_start);    //returned object
 
     if(answer == nullptr)
         throw "Random DayAction is equal nullptr.\n";
@@ -518,7 +477,7 @@ DayActions* DayActions::randomDayActions() const
     int number_of_actions = generateRandom(3,10);   //number of action added to day
 
     for(int i = 0; i <number_of_actions ; i++)
-        answer->addRandomAction();  //adding random Action
+		answer->addRandomAction();  //adding random Action
 
     answer->modified = true;;
 
@@ -578,20 +537,6 @@ void DayActions::addRandomAction()
     collection.push_back(addedAction);  //adding
     }
 
-std::string DayActions::toString() const
-    {
-    std::stringstream str;
-    str<<"DayActions: \n"<<"Start factors:\n"<<start_factors<<"\nCollection:\n";
-
-    for(Action* x : collection)
-        str<<x->toString();
-
-    str<<"\nFlags:\nmodified: "<<modified<<"\n";
-    str<<"goal function value => "<<goal_function_value<<" <=\n";
-
-    return str.str();
-    }
-
 Chromosome* DayActions::clone() const
     {
     DayActions* ans = new DayActions(*this);
@@ -602,7 +547,7 @@ Chromosome* DayActions::clone() const
 
 void DayActions::setStartFactors(Factors st_factors)
     {
-    start_factors = st_factors;
+	start_factors = st_factors;
 
     onlyUpdate();
     }
@@ -620,6 +565,9 @@ void DayActions::removeAllActions()
 
 void DayActions::onlyUpdate()
     {
+	if(start_factors.getA() > 0.1)
+		start_factors.setA(0.1);
+
     sort();
     for(Action* x : collection)
         x->update(&collection, start_factors);
@@ -643,5 +591,143 @@ void DayActions::setFlagModified()
     modified = true;
     }
 
+std::vector<Point> DayActions::getActivityPoints() const
+	{
+	std::vector<Point> vec;
+
+	vec.push_back(Point(0, start_factors.getY())); //start point
+
+	int previous_time = start_;
+	Factors previous_factors = start_factors;//start previous values
+
+	for(Action* x : collection)
+		{
+		int TimeBetween = x->getBegin() - previous_time;//times differences
+		double action_beg_y = previous_factors.getY() + previous_factors.getA() * TimeBetween;//y at the bginning of action
+
+		if(action_beg_y < 0 && previous_factors.getA() != 0.0)//y<0 at beggining
+			{
+			double x = (previous_factors.getA()*previous_time-previous_factors.getY())/previous_factors.getA(); //search the time when y = 0
+			vec.push_back(Point(x,0));
+			action_beg_y = 0.0;
+			}
+
+		//vector z action
+		std::vector<Point> help = x->getActivityDuring();
+		for(Point& x : help)
+			vec.push_back(x);
+
+		previous_time = x->getEnd();
+		previous_factors = x->getFactorsAfter();
+		}
 
 
+
+	if(previous_time < end_ )
+		{
+		int TimeBetween = end_ - previous_time;
+		double previous_y = previous_factors.getY() + previous_factors.getA() * TimeBetween;
+
+		if(previous_y < 0  && previous_factors.getA() != 0.0)
+			{
+			double x = (previous_factors.getA()*previous_time-previous_factors.getY() )/previous_factors.getA(); ;
+			vec.push_back(Point(x,0));
+			previous_y = 0;
+			}
+
+		vec.push_back(Point(end_,previous_y));
+		vec.push_back(Point(end_,0));
+		}
+
+	return  vec;
+	}
+
+std::string DayActions::toString() const
+	{
+	std::stringstream str;
+	str<<"DayActions: \n"<<"Start factors:\n"<<start_factors<<"\nCollection:\n";
+
+	for(Action* x : collection)
+		str<<x->toString();
+
+	str<<"goal function value: "<<goal_function_value<<"\n";
+
+	return str.str();
+	}
+
+std::shared_ptr<DayActions> DayActions::createFromFile(std::istream& in, std::vector<stringAndParseFunction> parse_form_and_function, std::shared_ptr<GoalFunction> goalFunction_, const std::vector<shared_ptr_Action>& cl_types, std::vector<checkingFunction>& checkFun )
+	{
+	std::shared_ptr<DayActions> ptr = nullptr;
+	Factors st_factors;
+	std::string read;
+	double val = -1;
+
+	if( in.bad() )
+		return nullptr;
+
+	if( !(in>>read) || read != "DayActions:"
+		|| !(in>>read) || read != "Start"  || !(in>>read) || read != "factors:"
+		|| !(in>>st_factors) || !(in>>read) || read != "Collection:" )
+		return nullptr;
+
+	ptr = std::make_shared<DayActions>(goalFunction_,cl_types,checkFun,st_factors);
+
+	while ( in>>read && read != "goal")
+		{
+		shared_ptr_Action ac = nullptr;
+
+		for(unsigned int i = 0; i < parse_form_and_function.size(); ++i )//searching in possible option
+			{
+			if( parse_form_and_function[i].first == read )
+				{
+				ac = parse_form_and_function[i].second(in);
+
+				if( ac != nullptr )
+					{
+					ptr->addAction(ac->clone());
+
+					break;
+					}
+				else
+					return nullptr;
+				}
+			}
+
+		if(ac == nullptr)
+			return nullptr;
+		}
+
+	if(read != "goal" || !(in>>read) || read != "function"
+	   || !(in>>read) || read != "value:"
+	   || !(in>>val) )
+		{
+		return nullptr;
+		}
+
+	ptr->goal_function_value = val;
+
+	ptr->updateFactors();
+
+	return ptr;
+	}
+
+
+
+std::vector< std::shared_ptr<DayActions>>  loadFromFile(std::istream& in, std::vector<stringAndParseFunction> parse_form_and_function, std::shared_ptr<GoalFunction> goalFunction_, const std::vector<shared_ptr_Action>& cl_types, std::vector<checkingFunction> checkFun )
+	{
+	std::vector< std::shared_ptr<DayActions>> vec;
+	std::shared_ptr<DayActions> ptr;
+
+	while ( ( ptr = DayActions::createFromFile(in,parse_form_and_function,goalFunction_,cl_types,checkFun) ) != nullptr  )
+		{
+		vec.push_back(ptr);
+		}
+
+	return vec;
+	}
+
+void DayActions::addRandAction()
+	{
+	addRandomAction();
+	onlyUpdate();
+	}

@@ -13,4 +13,5 @@ debug/addAction.o
 debug/DayActionsM.o
 debug/Chromosome.o
 debug/GeneticAlgorithm.o
+debug/Point.o
 debug/moc_MainWindow.o

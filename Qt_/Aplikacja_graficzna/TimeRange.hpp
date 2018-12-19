@@ -20,6 +20,7 @@
 
 #include "generateRandom.hpp" // zawiera funkcje generateRandom(int, int)
 #include <ostream>
+#include <istream>
 #include <sstream>
 
 /* --------- STALE ----------*/
@@ -70,13 +71,19 @@ public:
 
     TimeRange& operator=(const TimeRange&);
     friend std::ostream& operator<<(std::ostream& out, const TimeRange& range);
-    void operator()(int begin_, int end_);
+	friend bool operator>>(std::istream& in, TimeRange& range);
+
+	void operator()(int begin_, int end_);
 };
 
+std::ostream& operator<<(std::ostream& out, const TimeRange& range);
+bool operator>>(std::istream& in, TimeRange& range);
 
 std::array<int,2> minToHours (int mins); 		//Zamiana minut na godziny. Zwraca tablicę.
 												//element [0] to liczba minut, element [1] to ilosc godzin
 std::string minToString (int mins);				// do wyswietlania min jako licze godzin i minut
+
+bool stringTimeToInt(std::istream& in, int& min);
 
 
 #endif /* TIMERANGEFACTOR_HPP_ */

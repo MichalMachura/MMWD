@@ -33,7 +33,11 @@ public:
 
 	Factors& operator=(const Factors&);
     friend std::ostream& operator<<(std::ostream& out, const Factors& obj);
+	friend bool operator>>(std::istream& in, Factors& factors);
 };
+
+std::ostream& operator<<(std::ostream& out, const Factors& obj);
+bool operator>>(std::istream& in, Factors& factors);
 
 
 #endif // FACTORS_HPP

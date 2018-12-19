@@ -8,10 +8,13 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
+#include <istream>
+
 #include "TimeRange.hpp"
 #include "Factors.hpp"
-#include <sstream>
 #include "DayActions.hpp"
+#include "Point.hpp"
 
 using std::string;
 
@@ -19,6 +22,7 @@ class Action {
 
 protected:
 	TimeRange begin_end;   			// czas trwania czynnosci
+	Factors factors_before;
 	Factors factors_after;			// Wspolczynniki po wykonaniu czynnosci
 
 public:
@@ -45,19 +49,16 @@ public:
 
 	// ---- VIRTUAL FUNCTIONS ----
 
-	//virtual bool checkRestrictionAndRetake(std::vector<Action*>* collection) = 0;
-
-	virtual string toString() const ;
-
 	virtual void update(std::vector<Action*>* collection, Factors& start_factors) = 0;
-
-	virtual Action* randomAction(TimeRange range)const  = 0;
-
-	virtual Action* clone() const = 0;
-
 	virtual Action* divideByRange(TimeRange& range) = 0;
+	virtual Action* randomAction(TimeRange range)const  = 0;
+	virtual Action* clone() const = 0;
+	virtual string toString() const ;
+	virtual std::vector<Point> getActivityDuring() const ;
 
 	friend std::ostream& operator<<(std::ostream& out, const Action& obj);
+
+	static bool readFromFile(std::istream& in, Factors& st_factors, TimeRange& range);
 
 	virtual ~Action()
         {}

@@ -220,7 +220,6 @@ Makefile: ../Aplikacja_graficzna/Aplikacja_graficzna.pro F:/Qt_/5.12.0/mingw73_6
 		F:/Qt_/5.12.0/mingw73_64/mkspecs/features/qt_config.prf \
 		F:/Qt_/5.12.0/mingw73_64/mkspecs/win32-g++/qmake.conf \
 		F:/Qt_/5.12.0/mingw73_64/mkspecs/features/spec_post.prf \
-		.qmake.stash \
 		F:/Qt_/5.12.0/mingw73_64/mkspecs/features/exclusive_builds.prf \
 		F:/Qt_/5.12.0/mingw73_64/mkspecs/features/toolchain.prf \
 		F:/Qt_/5.12.0/mingw73_64/mkspecs/features/default_pre.prf \
@@ -408,7 +407,6 @@ F:/Qt_/5.12.0/mingw73_64/mkspecs/features/qt_functions.prf:
 F:/Qt_/5.12.0/mingw73_64/mkspecs/features/qt_config.prf:
 F:/Qt_/5.12.0/mingw73_64/mkspecs/win32-g++/qmake.conf:
 F:/Qt_/5.12.0/mingw73_64/mkspecs/features/spec_post.prf:
-.qmake.stash:
 F:/Qt_/5.12.0/mingw73_64/mkspecs/features/exclusive_builds.prf:
 F:/Qt_/5.12.0/mingw73_64/mkspecs/features/toolchain.prf:
 F:/Qt_/5.12.0/mingw73_64/mkspecs/features/default_pre.prf:

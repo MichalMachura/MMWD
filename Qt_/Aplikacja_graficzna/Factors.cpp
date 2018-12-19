@@ -55,3 +55,36 @@ std::ostream& operator<<(std::ostream& out, const Factors& obj)
 
     return out;
     }
+
+bool operator>>(std::istream& in, Factors& factors)
+	{
+	double y = -1;
+	double a = 1;
+	std::string read;
+
+	if( !(in.good()) )
+		return false;
+
+	if( !(in>>read) || read != "y")
+		return false;
+
+	if( !(in>>read) || read != "=")
+		return  false;
+
+	if( !(in>>y) || y < 0 || 100 < y)
+		return  false;
+
+	if( !(in>>read) || read != "a")
+		return false;
+
+	if( !(in>>read) || read != "=")
+		return  false;
+
+	if( !(in>>a) || a > 0 )
+		return  false;
+
+	factors.setY(y);
+	factors.setA(a);
+
+	return true;
+	}

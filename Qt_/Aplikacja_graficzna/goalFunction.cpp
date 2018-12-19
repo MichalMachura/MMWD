@@ -31,7 +31,7 @@ double CoffeeAndSleepGoalFunction::goalFunction(const std::vector<Action*>* coll
         sum = sum + part;
         }
 
-    answer = multiplier_integral*sum + multiplier_coffee*sum_of_coffee; // counting the answer
-    answer = answer / max_possible*100;
+	answer = multiplier_integral*sum + multiplier_coffee*sum_of_coffee; // counting the answer
+	answer = answer / max_possible*100;
     return answer;
     }

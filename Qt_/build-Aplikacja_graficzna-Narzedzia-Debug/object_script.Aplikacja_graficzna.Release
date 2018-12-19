@@ -13,4 +13,5 @@ release/addAction.o
 release/DayActionsM.o
 release/Chromosome.o
 release/GeneticAlgorithm.o
+release/Point.o
 release/moc_MainWindow.o
