@@ -54,10 +54,10 @@ class DayActions : public Chromosome
 
         void checkRestrictionsAndRetake();
         void deleteAllActionsAndGoalFunction();
-		void addRandomAction();
+        void addRandomAction();
 
     public:
-		DayActions(std::shared_ptr<GoalFunction> goalFunction_, const std::vector<shared_ptr_Action>& cl_types, std::vector<checkingFunction> checkFun, const Factors start_factors_);
+        DayActions(std::shared_ptr<GoalFunction> goalFunction_, const std::vector<shared_ptr_Action>& cl_types, std::vector<checkingFunction> checkFun, const Factors start_factors_);
         explicit DayActions(const DayActions& other);
 
         void setStartFactors(Factors st_factors = Factors(0,0));

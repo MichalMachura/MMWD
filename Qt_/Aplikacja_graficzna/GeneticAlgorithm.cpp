@@ -128,8 +128,8 @@ void GeneticAlgorithm::mutation(int places_for_mutation)
 
 void GeneticAlgorithm::generateCurrentValuesOfState()
     {   //current mean in future generation
-    current_best_size = generateRandom(MIN_BEST,max_best-1);//rand()%(max_best-MIN_BEST) + MIN_BEST;  //current best sizes
-    current_population_size = generateRandom(MIN_POPULATION_SIZE,max_population_size-1);//MIN_POPULATION_SIZE + rand()%(max_population_size-MIN_POPULATION_SIZE);   //current population size
+    current_best_size = generateRandom(MIN_BEST,max_best);//rand()%(max_best-MIN_BEST) + MIN_BEST;  //current best sizes
+    current_population_size = generateRandom(MIN_POPULATION_SIZE,max_population_size);//MIN_POPULATION_SIZE + rand()%(max_population_size-MIN_POPULATION_SIZE);   //current population size
     }
 
 void GeneticAlgorithm::countPlacesForCrossingAndMutation(int& places_for_crossing, int& places_for_mutation)
