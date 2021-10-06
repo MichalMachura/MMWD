@@ -1,0 +1,52 @@
+DayActions: 
+Start factors:
+y = 0     		a = 0    
+
+Collection:
+Sleep:
+START:   0h  0min	STOP:  8h  0min
+y = 100   		a = -0.216
+Length:  8h  0min
+Coffee:
+START:   9h  9min	STOP:  9h  9min
+y = 92.0242		a = -0.158307
+Portion:   1463ml
+Sleep:
+START:  15h  0min	STOP: 19h 17min
+y = 100   		a = -0.388268
+Length:  4h 17min
+Sleep:
+START:  20h 51min	STOP: 23h 44min
+y = 100   		a = -0.646568
+Length:  2h 53min
+goal function value: 26.236012
+DayActions: 
+Start factors:
+y = 0     		a = 0    
+
+Collection:
+Sleep:
+START:   0h  0min	STOP:  8h  0min
+y = 100   		a = -0.216
+Length:  8h  0min
+Coffee:
+START:   9h  9min	STOP:  9h  9min
+y = 92.0242		a = -0.158307
+Portion:   1463ml
+Sleep:
+START:   9h 55min	STOP: 11h 36min
+y = 100   		a = -0.952208
+Length:  1h 41min
+Sleep:
+START:  12h 40min	STOP: 14h 35min
+y = 100   		a = -0.886688
+Length:  1h 55min
+Sleep:
+START:  15h  0min	STOP: 19h 17min
+y = 100   		a = -0.388268
+Length:  4h 17min
+Sleep:
+START:  20h 51min	STOP: 23h 44min
+y = 100   		a = -0.646568
+Length:  2h 53min
+goal function value: 18.118969
